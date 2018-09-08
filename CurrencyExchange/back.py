@@ -85,31 +85,30 @@ def rel_plot(df):
 
 
 def ma_plot(df1, df2):
-    #print(df1.head(20))
-    
+
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
-    
+
     df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
     
     if isinstance(df1['Date'][0],datetime.datetime):
-        print ("It's a date")
-    
+        print("It's datetime")
+
     #df2 = df2.reset_index()
     #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
     
     ax = df1.plot(x='Date', y='MA')
     df1.plot(ax=ax, x='Date', y='MA')
-    
+
     ohlc = df1
     print(ohlc['Date'].dtype)
     #if isinstance(ohlc['Date'][0],str) :
     #    print ("It's a string")
     #ohlc['Date2'] = mdates.date2num(ohlc['Date'])
     #ohlc['Date'].map(mdates.date2num)
-    
+
     #print(ohlc.head(20))
-    
+
     """
     f1 = plt.subplot2grid((6, 4), (1, 0), rowspan=6, colspan=4, axisbg='#07000d')
     candlestick_ohlc(f1, df.values, width=.6, colorup='#53c156', colordown='#ff1717')
@@ -154,6 +153,18 @@ def ma_crossover(ohlc_data):
     else:
         return "none"
 
+def relative_strength_index(ohlc_data):
+    RSI_k = 14
+    overbought_val = 70
+    oversold_val = 30
+
+    rsi_data = ti.relative_strength_index(ohlc_data, RSI_k).tail(1)
+
+    print(rsi_data)
+    if(rsi_data.iloc[0,4] > overbought_val):
+        return "sell"
+    elif (rsi_data.iloc[0,4] < oversold_val):
+        return "buy"
 
 def compare_all():
     all_symbols = get_currency_pairs()
@@ -191,9 +202,9 @@ def compare_all():
 def save_data(filename, days):
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
-    
+
     base_url = "http://coincap.io/history"
-    url = base_url + str(days) + "day/"   
+    url = base_url + str(days) + "day/"
 
     saved_curr = []
     not_saved_curr = []
@@ -207,17 +218,15 @@ def save_data(filename, days):
         except:
             not_saved_curr.append(curr)
 
-
     global saved
     saved = True
-    
+
     return saved_curr, not_saved_curr
 
-
 if __name__ == '__main__':
-    df_rel = update_history(1, 20, "BTC", "DOGE")   
-    ohlc_df = format_as_ohlc(df_rel, "5Min")    
-    ma_df = ma(ohlc_df, 10)    
+    df_rel = update_history(1, 20, "BTC", "DOGE")
+    ohlc_df = format_as_ohlc(df_rel, "5Min")
+    ma_df = ma(ohlc_df, 10)
     ma_plot(ma_df, df_rel)
-    
+
     #compare_all()
