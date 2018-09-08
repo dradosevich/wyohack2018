@@ -1,6 +1,9 @@
 This folder will contain all the work done for the "Best for Wyoming"
 competition
 
+Imp. information
+http://shura.shu.ac.uk/18151/1/Elsaghier_2017_PhD_PlanningAndOptimising.pdf
+
 Source: https://www2.deloitte.com/content/dam/Deloitte/global/Documents/Energy-and-Resources/gx-oil-gas-blockchain-article.pdf
 Utilizing blockchain technology to record and manage the movement of goods and related
 invoices will signi cantly mitigate
