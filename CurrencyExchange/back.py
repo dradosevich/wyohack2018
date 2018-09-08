@@ -128,7 +128,6 @@ def ma_crossover(ohlc_data):
     slow_ma = ma(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
     fast_ma = ma(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
 
-    print(slow_ma)
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
         return "buy"
     elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
@@ -147,8 +146,9 @@ def compare_all():
         crypto_pair = "DAI/" + symbol[0]
 
         try:
-            crypto_df = update_history(2,25, 'DAI', symbol[0])
+            crypto_df = update_history(7,25, 'DAI', symbol[0])
         except:
+            count = count + 1
             continue
 
         ohlc_data = format_as_ohlc(crypto_df, '5Min')
@@ -170,13 +170,11 @@ def compare_all():
 
 if __name__ == '__main__':
 
-
     #url = "http://coincap.io/front"
     #df = update_front(url)
     #base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
     #relative_df = update_history(1, 100, 'BTC', 'DOGE')
     #rel_plot(relative_df)
-
 
     #converted_data = convert_data(relative_df, '15Min')
     #print(converted_data)
