@@ -37,8 +37,7 @@ def update_history(days, num_points, curr1, curr2):
     df_rel = df1
     df_rel[1] = relative_value
     
-    print(df_rel)
-     
+    df_rel = df_rel.rename(index=str, columns = {0: 'time', 1: 'price'})
     return df_rel
     
 
@@ -57,12 +56,18 @@ def compare(df, curr1, curr2):
 
 
 def rel_plot(df):
-    df.plot(x='time', y='value')
+    df.plot(x='time', y='price')
 
 
 def ma(df, n):
     ma_df = ti.moving_average(df, n)
     return ma_df
+
+
+def convert_data(df, timeframe):
+    df['time'] = pd.to_datetime(df['time'],unit='ms')
+    df = df.set_index(pd.DatetimeIndex(df['time']))
+    data_ohlc =  df['price'].resample(timeframe).ohlc()
 
 if __name__ == '__main__':
     url = "http://coincap.io/front"
@@ -71,5 +76,7 @@ if __name__ == '__main__':
     relative_df = update_history(1, 10, 'BTC', 'DOGE')
     rel_plot(relative_df)
     
+    convert_data(relative_df, '15Min')
+    print(relative_df)
     #ma_df = ma(relative_df, 5)
     
