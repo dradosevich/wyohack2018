@@ -15,7 +15,7 @@ import csv
 
 
 dai_down = False
-    
+
 #Store dai history in memory
 dai_df = []
 
@@ -31,7 +31,8 @@ def update_front(url):
 def update_history(days, num_points, curr1, curr2):
     base_url = "http://coincap.io/history/"
     url = base_url + str(days) + "day/"
-    
+
+    print(curr2)
     global dai_down
     if dai_down is False:
         url1 = url + curr1
@@ -40,15 +41,13 @@ def update_history(days, num_points, curr1, curr2):
         global dai_df
         dai_df = df1
         dai_down = True
-        
-    url2 = url + curr2   
-    jdata2 = requests.get(url2).json()    
+
+    url2 = url + curr2
+    jdata2 = requests.get(url2).json()
     df2 = pd.DataFrame(jdata2['price'][-num_points:])
-    
+
     df1 = dai_df
-    
-    print(df1)
-    
+
     #Get relative value
     relative_value = df1[1] / df2[1]
 
@@ -139,23 +138,26 @@ def compare_all():
     signal_list = []
     for symbol in all_symbols:
         crypto_pair = "DAI/" + symbol[0]
-        relative_df = update_history(1, 25, 'DAI', symbol[0])
-        print(crypto_pair)
+        try:
+            relative_df = update_history(1,25, 'DAI', symbol[0])
+        except:
+            continue
+        # print(crypto_pair)
         converted_data = convert_data(relative_df, '5Min')
         slow_ma = ma(converted_data, 20)
         fast_ma = ma(converted_data, 10)
 
         result = ma_crossover(slow_ma.tail(2), fast_ma.tail(2))
-        print(result)
+        # print(result)
         if result is "buy" or "sell":
             signal_list.append(crypto_pair)
         else:
             continue
-        if count is 10:
-            return
-        count = count + 1
+        # if count is 10:
+        #     return
+        # count = count + 1
 
-    for pair in crypto_pair:
+    for pair in signal_list:
         print(pair)
 
 
@@ -167,7 +169,6 @@ def save_data():
     print(currency_list)
 
 if __name__ == '__main__':
-    
     save_data()
     #url = "http://coincap.io/front"
     #df = update_front(url)
