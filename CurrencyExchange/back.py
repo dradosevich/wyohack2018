@@ -59,6 +59,18 @@ def rel_plot(df):
     df.plot(x='time', y='price')
 
 
+def ma_plot(df1, df2):
+    df1 = df1.reset_index()
+    df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
+
+    df2 = df2.reset_index()
+    df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
+    
+    ax = df1.plot(x='Date', y='MA')
+    df2.plot(ax=ax, x='Date', y='MA')
+    
+    
+
 def ma(df, n):
     ma_df = ti.moving_average(df, n)
     return ma_df
@@ -86,5 +98,7 @@ if __name__ == '__main__':
     #print(converted_data)
     slow_ma = ma(converted_data, 20)
     fast_ma = ma(converted_data, 10)
-    print(ma_df)
+    #print(ma_df)
+    
+    ma_plot(slow_ma, fast_ma)
     
