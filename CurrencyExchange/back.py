@@ -68,15 +68,23 @@ def convert_data(df, timeframe):
     df['time'] = pd.to_datetime(df['time'],unit='ms')
     df = df.set_index(pd.DatetimeIndex(df['time']))
     data_ohlc =  df['price'].resample(timeframe).ohlc()
+    
+    data_ohlc = data_ohlc.dropna()
+    
+    data_ohlc = data_ohlc.rename(index=str, columns = {'time': 'Time', 'open': 'Open', 'low':'Low', 'high': 'High', 'close': 'Close'})
+    
+    return data_ohlc
 
 if __name__ == '__main__':
     url = "http://coincap.io/front"
     df = update_front(url)
     base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
-    relative_df = update_history(1, 10, 'BTC', 'DOGE')
+    relative_df = update_history(1, 100, 'BTC', 'DOGE')
     rel_plot(relative_df)
     
-    convert_data(relative_df, '15Min')
-    print(relative_df)
-    #ma_df = ma(relative_df, 5)
+    converted_data = convert_data(relative_df, '5Min')
+    #print(converted_data)
+    slow_ma = ma(converted_data, 20)
+    fast_ma = ma(converted_data, 10)
+    #print(ma_df)
     
