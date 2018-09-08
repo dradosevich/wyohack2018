@@ -158,13 +158,21 @@ def compare_all():
     for pair in crypto_pair:
         print(pair)
 
+
+#Download and save data into csv file
+def save_data():
+    url = "http://coincap.io/coins"
+    jdata = requests.get(url).json()
+    currency_list = csv.reader(jdata)
+    print(currency_list)
+
 if __name__ == '__main__':
     
-    
+    save_data()
     #url = "http://coincap.io/front"
     #df = update_front(url)
     #base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
-    relative_df = update_history(1, 100, 'BTC', 'DOGE')
+    #relative_df = update_history(1, 100, 'BTC', 'DOGE')
     #rel_plot(relative_df)
 
 
@@ -176,4 +184,4 @@ if __name__ == '__main__':
 
     #ma_plot(slow_ma, fast_ma)
 
-    compare_all()
+    #compare_all()
