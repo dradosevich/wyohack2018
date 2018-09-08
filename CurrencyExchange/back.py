@@ -138,6 +138,18 @@ def ma_crossover(ohlc_data):
     else:
         return "none"
 
+def relative_strength_index(ohlc_data):
+    RSI_k = 14
+    overbought_val = 70
+    oversold_val = 30
+
+    rsi_data = ti.relative_strength_index(ohlc_data, RSI_k).tail(1)
+
+    print(rsi_data)
+    if(rsi_data.iloc[0,4] > overbought_val):
+        return "sell"
+    elif (rsi_data.iloc[0,4] < oversold_val):
+        return "buy"
 
 def compare_all():
     all_symbols = get_currency_pairs()
@@ -171,30 +183,27 @@ def compare_all():
     for pair in sell_list:
         print(pair + "\t sell")
 
-if __name__ == '__main__':
-
-    base_url = "http://coincap.io/history/"
-    url = base_url + str(days) + "day/"
-
-    saved_curr = []
-    not_saved_curr = []
-    for curr in jdata:
-        try:
-            url_curr = url + curr
-            jdata1 = requests.get(url_curr).json()
-            df_curr = pd.DataFrame(jdata1['price'])
-            df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
-            saved_curr.append(curr)
-        except:
-            not_saved_curr.append(curr)
-
-
-    global saved
-    saved = True
 
 if __name__ == '__main__':
 
-    print('working')
+
+    # base_url = "http://coincap.io/history/"
+    # url = base_url + str(days) + "day/"
+    #
+    # saved_curr = []
+    # not_saved_curr = []
+    # for curr in jdata:
+    #     try:
+    #         url_curr = url + curr
+    #         jdata1 = requests.get(url_curr).json()
+    #         df_curr = pd.DataFrame(jdata1['price'])
+    #         df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
+    #         saved_curr.append(curr)
+    #     except:
+    #         not_saved_curr.append(curr)
+    #
+    #
+
 
     #list_not_saved = save_data('price', 1)
     #print(list_not_saved)
@@ -212,4 +221,4 @@ if __name__ == '__main__':
 
     #ma_plot(slow_ma, fast_ma)
 
-    #compare_all()
+    compare_all()
