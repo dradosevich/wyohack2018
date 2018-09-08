@@ -1,6 +1,14 @@
 This folder will contain all the work done for the "Best for Wyoming"
 competition
 
+Imp. information
+http://shura.shu.ac.uk/18151/1/Elsaghier_2017_PhD_PlanningAndOptimising.pdf
+
+Source: https://www2.deloitte.com/content/dam/Deloitte/global/Documents/Energy-and-Resources/gx-oil-gas-blockchain-article.pdf
+Utilizing blockchain technology to record and manage the movement of goods and related
+invoices will signi cantly mitigate
+the risk of errors and the opportunity to alter invoice values or recipients.
+
 Initial thought: Currently supply chains are kept within the specific companies,
 leading to a lack of transparency and loss of revenue.
 Research: Blockchain use in Wyoming, how it functions, companies using
@@ -17,5 +25,25 @@ Coal: 40% of U.S. production
  Notably, Wyoming produces more trona (the chief source of soda ash) than any other state,
  and the largest deposit of trona in the world sits under Sweetwater County in Wyoming.
 
+
  The U.S. Energy Information Administration (EIA) cannot identify the origin of gasoline
 sold at fueling stations. The gasoline a company sells is not necessarily produced by that company.
+Gasoline brands get mixed during shipment
+Gasoline is sold at more than 100,000 retail outlets across the nation, and many are unbranded
+dealers that may sell gasoline produced by different companies.
+Crude oil also gets mixed at the refinery
+Even if EIA could determine the origin of the gasoline sold at fueling stations, the source of
+the crude oil and other liquids used at refineries may vary. Most refiners use a mix of crude
+oils from various domestic and foreign sources. The mix of crude oils can change based on the
+relative cost and availability of crude oil from those sources
+-----Supply chain oil pic https://www.api.org/~/media/Files/Policy/Safety/API-Oil-Supply-Chain.pdf
+U.S. production reached more than 2.3 billion barrels per year in 2012.
+The U.S. has 615 million barrels of storage capacity at refineries.
+• The U.S. has 950 million barrels of storage capacity at bulk terminals.
+• 89 million barrels can be stored in the product pipeline system.
+143 refineries in the United States
+• In 2012, U.S. refineries produced over 3.2 billion barrels of finished
+motor gasoline.
+Over 500 natural gas processing plants
+o  Over 305,000 miles of natural gas pipeline o  Over 30 major market hubs
+o  Over 400 storage facilities
