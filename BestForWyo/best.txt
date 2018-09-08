@@ -47,3 +47,33 @@ motor gasoline.
 Over 500 natural gas processing plants
 o  Over 305,000 miles of natural gas pipeline o  Over 30 major market hubs
 o  Over 400 storage facilities
+
+_________________________
+
+2.3.3 Petroleum industry supply chain (SC) under uncertainties
+Uncertainty exists where those involved do not have the knowledge they need
+to accurately describe the current state of events or predict future outcomes. It
+can impact on decision making in the supply chain if decision makers are
+unclear about their objectives; if they lack information about the supply chain or 
+Chapter 2: Literature Review
+_______________________________________________________________
+19
+its environment, or they lack the capacity to process this information; if they are
+unable to accurately predict the impact of possible control actions on supply
+chain behaviours; or if they lack effective control actions Van der Vorst et al.
+(2002). Uncertainty can be a long-term problem; for example, the effects of
+fluctuations in the price of raw materials, market demand and production rates
+may be felt for five to ten years Sahinidis et al. (1989). Mid-term uncertainties
+may affect operations for one to two years (Gupta & Maranas, 2003), while
+short-term uncertainties are day-to-day or week-to-week processing variations
+(e.g. equipment failure or a cancelled order) that require an immediate response
+Subrahmanyam et al. (1994).
+It is extremely important that the petroleum processing industry plans for a high
+degree of uncertainty. As highlighted above, the industry is subject to a number
+of uncertainties, including variable reserves, production problems, and
+fluctuations in the price of raw materials, refined products and market demand.
+Investigating the effects of uncertainties in demand, market prices, raw material
+costs and production yields on planning decisions in the petrochemical supply
+chain, Lababidi et al. (2004) found the impact to be significant, with market
+demand being the most important. Figure 2.7 shows how the effects of market
+uncertainty are felt throughout the supply chain (Das, & Abdel-Malek, 2003). 

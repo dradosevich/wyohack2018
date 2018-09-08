@@ -74,21 +74,21 @@ def rel_plot(df):
 def ma_plot(df1, df2):
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
-    
+
     df2 = df2.reset_index()
     df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
     #ax = df1.plot(x='Date', y='MA')
     #df2.plot(ax=ax, x='Date', y='MA')
-    
+
     ohlc = df1
     ohlc['Date'] = ohlc['Date'].map(mdates.date2num)
-    
+
     f1 = plt.subplot2grid((6, 4), (1, 0), rowspan=6, colspan=4, axisbg='#07000d')
     candlestick_ohlc(f1, df.values, width=.6, colorup='#53c156', colordown='#ff1717')
     f1.xaxis_date()
     f1.xaxis.set_major_formatter(mdates.DateFormatter('%y-%m-%d %H:%M:%S'))
-    
+
     plt.xticks(rotation=45)
     plt.ylabel('Stock Price')
     plt.xlabel('Date Hours:Minutes')
@@ -113,10 +113,6 @@ def convert_data(df, timeframe):
     return data_ohlc
 
 def ma_crossover(slow_ma, fast_ma):
-    print(slow_ma)
-    print(fast_ma)
-    print( fast_ma.iloc[0,4])
-    print(slow_ma.iloc[0,4])
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
         #upward ma_crossover, buy signal
         return "buy"
@@ -129,19 +125,28 @@ def ma_crossover(slow_ma, fast_ma):
 
 def compare_all():
     all_symbols = get_currency_pairs()
-    #for symbol in symbols:
-    relative_df = update_history(1, 100, 'DAI', all_symbols[0][0])
-    converted_data = convert_data(relative_df, '15Min')
-    slow_ma = ma(converted_data, 20)
-    fast_ma = ma(converted_data, 10)
+    count = 0
+    signal_list = []
+    for symbol in all_symbols:
+        crypto_pair = "DAI/" + symbol[0]
+        relative_df = update_history(1, 25, 'DAI', symbol[0])
+        print(crypto_pair)
+        converted_data = convert_data(relative_df, '5Min')
+        slow_ma = ma(converted_data, 20)
+        fast_ma = ma(converted_data, 10)
 
-    result = ma_crossover(slow_ma.tail(2), fast_ma.tail(2))
-    print(result)
-    # if result is "buy" or "sell":
-    #     #save cypto pair in list or some such
-    # else:
-    #     continue
+        result = ma_crossover(slow_ma.tail(2), fast_ma.tail(2))
+        print(result)
+        if result is "buy" or "sell":
+            signal_list.append(crypto_pair)
+        else:
+            continue
+        if count is 10:
+            return
+        count = count + 1
 
+    for pair in crypto_pair:
+        print(pair)
 
 if __name__ == '__main__':
     #Global variable to indicate if dai is downloaded or not
@@ -168,4 +173,3 @@ if __name__ == '__main__':
     #ma_plot(slow_ma, fast_ma)
 
     compare_all()
-    #this will go in a loop of some sort
