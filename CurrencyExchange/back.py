@@ -111,9 +111,6 @@ def ma(df, n):
 
 
 def format_as_ohlc(df, timeframe):
-    slow_lookback = 20
-    fast_lookback = 10
-
     df['time'] = pd.to_datetime(df['time'],unit='ms')
     df = df.set_index(pd.DatetimeIndex(df['time']))
     data_ohlc =  df['price'].resample(timeframe).ohlc()
@@ -125,9 +122,13 @@ def format_as_ohlc(df, timeframe):
     return data_ohlc
 
 def ma_crossover(ohlc_data):
+    slow_lookback = 20
+    fast_lookback = 10
+
     slow_ma = ma(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
     fast_ma = ma(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
 
+    print(slow_ma)
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
         return "buy"
     elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
@@ -141,11 +142,12 @@ def compare_all():
     count = 0
     buy_list = []
     sell_list = []
+
     for symbol in all_symbols:
         crypto_pair = "DAI/" + symbol[0]
 
         try:
-            crypto_df = update_history(1,25, 'DAI', symbol[0])
+            crypto_df = update_history(2,25, 'DAI', symbol[0])
         except:
             continue
 
@@ -156,17 +158,15 @@ def compare_all():
             buy_list.append(crypto_pair)
         elif result is "sell":
             sell_list.append(crypto_pair)
-        else:
-            continue
 
         if count is 10:
             return
         count = count + 1
 
-        for pair in buy_list:
-            print(pair + "\t buy")
-        for pair in sell_list:
-            print(pair + "\t sell")
+    for pair in buy_list:
+        print(pair + "\t buy")
+    for pair in sell_list:
+        print(pair + "\t sell")
 
 if __name__ == '__main__':
 
