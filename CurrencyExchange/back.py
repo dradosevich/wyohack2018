@@ -85,20 +85,18 @@ def rel_plot(df):
 
 
 def ma_plot(df1, df2):
-    print(df1.head(20))
+    #print(df1.head(20))
     
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
     
     df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
     
-    if isinstance(df1['Date'][0],datetime.datetime) :
+    if isinstance(df1['Date'][0],datetime.datetime):
         print ("It's a date")
     
     #df2 = df2.reset_index()
     #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
-    
-    #print(df1.head(20))
     
     ax = df1.plot(x='Date', y='MA')
     df1.plot(ax=ax, x='Date', y='MA')
