@@ -12,6 +12,7 @@ import matplotlib.dates as mdates
 from mpl_finance import candlestick_ohlc
 import technical_indicators as ti
 import csv
+import datetime
 
 
 #Indicate whether dai is in memory
@@ -84,18 +85,34 @@ def rel_plot(df):
 
 
 def ma_plot(df1, df2):
+    print(df1.head(20))
+
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    df2 = df2.reset_index()
-    df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
+    df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
 
-    #ax = df1.plot(x='Date', y='MA')
-    #df2.plot(ax=ax, x='Date', y='MA')
+    if isinstance(df1['Date'][0],datetime.datetime) :
+        print ("It's a date")
+
+    #df2 = df2.reset_index()
+    #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
+
+    #print(df1.head(20))
+
+    ax = df1.plot(x='Date', y='MA')
+    df1.plot(ax=ax, x='Date', y='MA')
 
     ohlc = df1
-    ohlc['Date'] = ohlc['Date'].map(mdates.date2num)
+    print(ohlc['Date'].dtype)
+    #if isinstance(ohlc['Date'][0],str) :
+    #    print ("It's a string")
+    #ohlc['Date2'] = mdates.date2num(ohlc['Date'])
+    #ohlc['Date'].map(mdates.date2num)
 
+    #print(ohlc.head(20))
+
+    """
     f1 = plt.subplot2grid((6, 4), (1, 0), rowspan=6, colspan=4, axisbg='#07000d')
     candlestick_ohlc(f1, df.values, width=.6, colorup='#53c156', colordown='#ff1717')
     f1.xaxis_date()
@@ -105,6 +122,7 @@ def ma_plot(df1, df2):
     plt.ylabel('Stock Price')
     plt.xlabel('Date Hours:Minutes')
     plt.show()
+    """
 
 
 
@@ -184,41 +202,34 @@ def compare_all():
         print(pair + "\t sell")
 
 
+def save_data(filename, days):
+    url = "http://coincap.io/coins"
+    jdata = requests.get(url).json()
+
+    base_url = "http://coincap.io/history"
+    url = base_url + str(days) + "day/"
+
+    saved_curr = []
+    not_saved_curr = []
+    for curr in jdata:
+        try:
+            url_curr = url + curr
+            jdata1 = requests.get(url_curr).json()
+            df_curr = pd.DataFrame(jdata1['price'])
+            df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
+            saved_curr.append(curr)
+        except:
+            not_saved_curr.append(curr)
+
+    global saved
+    saved = True
+
+    return saved_curr, not_saved_curr
+
 if __name__ == '__main__':
+    df_rel = update_history(1, 20, "BTC", "DOGE")
+    ohlc_df = format_as_ohlc(df_rel, "5Min")
+    ma_df = ma(ohlc_df, 10)
+    ma_plot(ma_df, df_rel)
 
-
-    # base_url = "http://coincap.io/history/"
-    # url = base_url + str(days) + "day/"
-    #
-    # saved_curr = []
-    # not_saved_curr = []
-    # for curr in jdata:
-    #     try:
-    #         url_curr = url + curr
-    #         jdata1 = requests.get(url_curr).json()
-    #         df_curr = pd.DataFrame(jdata1['price'])
-    #         df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
-    #         saved_curr.append(curr)
-    #     except:
-    #         not_saved_curr.append(curr)
-    #
-    #
-
-
-    #list_not_saved = save_data('price', 1)
-    #print(list_not_saved)
-    #url = "http://coincap.io/front"
-    #df = update_front(url)
-    #base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
-    #relative_df = update_history(1, 100, 'BTC', 'DOGE')
-    #rel_plot(relative_df)
-
-    #converted_data = convert_data(relative_df, '15Min')
-    #print(converted_data)
-    #slow_ma = ma(converted_data, 20)
-    #fast_ma = ma(converted_data, 10)
-    #print(ma_df)
-
-    #ma_plot(slow_ma, fast_ma)
-
-    compare_all()
+    #compare_all()
