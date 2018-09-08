@@ -8,6 +8,7 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 import technical_indicators as ti
+import csv
 
 
 #Request updated info
@@ -42,9 +43,8 @@ def update_history(days, num_points, curr1, curr2):
 def get_currency_pairs():
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
-    currency_list = json.loads(jdata)
-    return currency_list
-
+    currency_list = csv.reader(jdata)
+    return list(currency_list)
 
 def compare(df, curr1, curr2):
     price1 = df.loc[df['long'] == curr1]
@@ -58,7 +58,6 @@ def compare(df, curr1, curr2):
     rel_price = price2 - base_price
 
     return base_price, rel_price
-
 
 def rel_plot(df):
     df.plot(x='time', y='price')
@@ -93,35 +92,51 @@ def convert_data(df, timeframe):
     return data_ohlc
 
 def ma_crossover(slow_ma, fast_ma):
-    print(slow_ma.iloc[4,0])
-    if fast_ma.iloc[4,0] < slow_ma.iloc[4,0] and fast_ma.iloc[4,1] > slow_ma.iloc[4,1]:
+    print(slow_ma)
+    print(fast_ma)
+    print( fast_ma.iloc[0,4])
+    print(slow_ma.iloc[0,4])
+    if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
         #upward ma_crossover, buy signal
         return "buy"
-    elif fast_ma.iloc[4,0] > slow_ma.iloc[4,0] and fast_ma.iloc[4,1] < slow_ma.iloc[4,1]:
+    elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
         #downward ma_crossover, sell signal
         return "sell"
     else:
         return "none"
 
 
-if __name__ == '__main__':
-    url = "http://coincap.io/front"
-    df = update_front(url)
-    base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
-    relative_df = update_history(1, 100, 'BTC', 'DOGE')
-    rel_plot(relative_df)
-
+def compare_all():
+    all_symbols = get_currency_pairs()
+    #for symbol in symbols:
+    relative_df = update_history(1, 100, 'DAI', all_symbols[0][0])
     converted_data = convert_data(relative_df, '15Min')
-    #print(converted_data)
     slow_ma = ma(converted_data, 20)
     fast_ma = ma(converted_data, 10)
-    #print(ma_df)
 
-    ma_plot(slow_ma, fast_ma)
-
-    #this will go in a loop of some sort
-    # result = ma_crossover(slow_ma, fast_ma)
+    result = ma_crossover(slow_ma.tail(2), fast_ma.tail(2))
+    print(result)
     # if result is "buy" or "sell":
     #     #save cypto pair in list or some such
     # else:
     #     continue
+
+
+if __name__ == '__main__':
+    #url = "http://coincap.io/front"
+    #df = update_front(url)
+    #base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
+    #relative_df = update_history(1, 100, 'BTC', 'DOGE')
+    #rel_plot(relative_df)
+
+
+    #converted_data = convert_data(relative_df, '15Min')
+    #print(converted_data)
+    #slow_ma = ma(converted_data, 20)
+    #fast_ma = ma(converted_data, 10)
+    #print(ma_df)
+
+    #ma_plot(slow_ma, fast_ma)
+
+    compare_all()
+    #this will go in a loop of some sort
