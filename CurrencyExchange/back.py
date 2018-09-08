@@ -90,13 +90,13 @@ def ma_plot(df1, df2):
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
     df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
-    
+
     if isinstance(df1['Date'][0],datetime.datetime):
         print("It's datetime")
 
     #df2 = df2.reset_index()
     #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
-    
+
     ax = df1.plot(x='Date', y='MA')
     df1.plot(ax=ax, x='Date', y='MA')
 
@@ -145,7 +145,6 @@ def ma_crossover(ohlc_data):
 
     slow_ma = ma(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
     fast_ma = ma(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
-
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
         return "buy"
     elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
@@ -165,16 +164,33 @@ def relative_strength_index(ohlc_data):
         return "sell"
     elif (rsi_data.iloc[0,4] < oversold_val):
         return "buy"
+    else:
+        return "none"
+
+def macd(ohlc_data):
+    slow_ma = 15
+    fast_ma = 8
+
+    macd_data = ti.macd(ohlc_data, fast_ma, slow_ma).tail(2)
+    print(macd_data)
+    if macd_data.iloc[0,6] < 0 and macd_data.iloc[1,6] > 0:
+        return "buy"
+    elif macd_data.iloc[0,6] > 0 and macd_data.iloc[1,6] < 0:
+        return "sell"
+    else:
+        return "none"
 
 def compare_all():
     all_symbols = get_currency_pairs()
     count = 0
     buy_list = []
     sell_list = []
+    fileout = "Market.csv"
+    outfile = open(fileout, 'w', newline='')
+    crypto_writer = csv.writer(outfile, delimiter=',')
 
     for symbol in all_symbols:
-        crypto_pair = "DAI/" + symbol[0]
-
+        crypto_pair = "DAI" + symbol[0]
         try:
             crypto_df = update_history(7,25, 'DAI', symbol[0])
         except:
@@ -183,12 +199,9 @@ def compare_all():
 
         ohlc_data = format_as_ohlc(crypto_df, '5Min')
         result = ma_crossover(ohlc_data)
-
-        if result is "buy":
-            buy_list.append(crypto_pair)
-        elif result is "sell":
-            sell_list.append(crypto_pair)
-
+        result2 = macd(ohlc_data)
+        if result is "buy" or result is "sell":
+            crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
         if count is 10:
             return
         count = count + 1
@@ -198,6 +211,7 @@ def compare_all():
     for pair in sell_list:
         print(pair + "\t sell")
 
+    outfile.close()
 
 def save_data(filename, days):
     url = "http://coincap.io/coins"
@@ -224,9 +238,9 @@ def save_data(filename, days):
     return saved_curr, not_saved_curr
 
 if __name__ == '__main__':
-    df_rel = update_history(1, 20, "BTC", "DOGE")
-    ohlc_df = format_as_ohlc(df_rel, "5Min")
-    ma_df = ma(ohlc_df, 10)
-    ma_plot(ma_df, df_rel)
+    # df_rel = update_history(1, 20, "BTC", "DOGE")
+    # ohlc_df = format_as_ohlc(df_rel, "5Min")
+    # ma_df = ma(ohlc_df, 10)
+    # ma_plot(ma_df, df_rel)
 
-    #compare_all()
+    compare_all()
