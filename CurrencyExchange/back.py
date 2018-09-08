@@ -12,6 +12,7 @@ import matplotlib.dates as mdates
 from mpl_finance import candlestick_ohlc
 import technical_indicators as ti
 import csv
+import datetime
 
 
 #Indicate whether dai is in memory
@@ -84,18 +85,34 @@ def rel_plot(df):
 
 
 def ma_plot(df1, df2):
+    print(df1.head(20))
+    
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
-
-    df2 = df2.reset_index()
-    df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
-
-    #ax = df1.plot(x='Date', y='MA')
-    #df2.plot(ax=ax, x='Date', y='MA')
-
+    
+    df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
+    
+    if isinstance(df1['Date'][0],datetime.datetime) :
+        print ("It's a date")
+    
+    #df2 = df2.reset_index()
+    #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
+    
+    #print(df1.head(20))
+    
+    ax = df1.plot(x='Date', y='MA')
+    df1.plot(ax=ax, x='Date', y='MA')
+    
     ohlc = df1
-    ohlc['Date'] = ohlc['Date'].map(mdates.date2num)
-
+    print(ohlc['Date'].dtype)
+    #if isinstance(ohlc['Date'][0],str) :
+    #    print ("It's a string")
+    #ohlc['Date2'] = mdates.date2num(ohlc['Date'])
+    #ohlc['Date'].map(mdates.date2num)
+    
+    #print(ohlc.head(20))
+    
+    """
     f1 = plt.subplot2grid((6, 4), (1, 0), rowspan=6, colspan=4, axisbg='#07000d')
     candlestick_ohlc(f1, df.values, width=.6, colorup='#53c156', colordown='#ff1717')
     f1.xaxis_date()
@@ -105,6 +122,7 @@ def ma_plot(df1, df2):
     plt.ylabel('Stock Price')
     plt.xlabel('Date Hours:Minutes')
     plt.show()
+    """
 
 
 
@@ -191,6 +209,14 @@ def save_data(filename, days):
 if __name__ == '__main__':
     
     print('working')
+    
+    df_rel = update_history(1, 20, "BTC", "DOGE")
+    
+    ohlc_df = convert_data(df_rel, "5Min")
+    
+    ma_df = ma(ohlc_df, 10)
+    
+    ma_plot(ma_df, df_rel)
     
     #list_not_saved = save_data('price', 1)
     #print(list_not_saved)
