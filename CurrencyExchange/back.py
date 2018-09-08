@@ -14,11 +14,14 @@ import technical_indicators as ti
 import csv
 
 
+#Indicate whether dai is in memory
 dai_down = False
 
 #Store dai history in memory
 dai_df = []
 
+#Indicate whether historic data is saved into csv
+saved = False
 
 #Request updated info
 def update_front(url):
@@ -162,14 +165,35 @@ def compare_all():
 
 
 #Download and save data into csv file
-def save_data():
+def save_data(filename, days):
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
-    currency_list = csv.reader(jdata)
-    print(currency_list)
+
+    base_url = "http://coincap.io/history/"
+    url = base_url + str(days) + "day/"
+    
+    saved_curr = []
+    not_saved_curr = []
+    for curr in jdata:
+        try:
+            url_curr = url + curr
+            jdata1 = requests.get(url_curr).json()
+            df_curr = pd.DataFrame(jdata1['price'])
+            df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
+            saved_curr.append(curr)
+        except:
+            not_saved_curr.append(curr)
+
+
+    global saved
+    saved = True
 
 if __name__ == '__main__':
-    save_data()
+    
+    print('working')
+    
+    #list_not_saved = save_data('price', 1)
+    #print(list_not_saved)
     #url = "http://coincap.io/front"
     #df = update_front(url)
     #base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
