@@ -22,18 +22,23 @@ def update_front(url):
 
 
 #Update historical data
-def update_history(days, num_points, curr1, curr2):
+def update_history(days, num_points, curr1, curr2, dai_down):
     base_url = "http://coincap.io/history/"
     url = base_url + str(days) + "day/"
-    url1 = url + curr1
-    url2 = url + curr2
-
-    jdata1 = requests.get(url1).json()
-    jdata2 = requests.get(url2).json()
-
-    df1 = pd.DataFrame(jdata1['price'][-num_points:])
+    
+    if dai_down == False:
+        url1 = url + curr1
+        jdata1 = requests.get(url1).json()
+        df1 = pd.DataFrame(jdata1['price'][-num_points:])
+        dai_df = df1
+        dai_down = True
+        
+    url2 = url + curr2   
+    jdata2 = requests.get(url2).json()    
     df2 = pd.DataFrame(jdata2['price'][-num_points:])
-
+    
+    df1 = dai_df
+    
     #Get relative value
     relative_value = df1[1] / df2[1]
 
@@ -139,6 +144,14 @@ def compare_all():
 
 
 if __name__ == '__main__':
+    #Global variable to indicate if dai is downloaded or not
+    global dai_down
+    dai_down = False
+    
+    #Store dai history in memory
+    global dai_df
+    
+    
     #url = "http://coincap.io/front"
     #df = update_front(url)
     #base_price, rel_price = compare(df, "Bitcoin", "Ethereum")
