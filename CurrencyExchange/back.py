@@ -7,6 +7,9 @@ import requests
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import matplotlib.dates as mdates
+from mpl_finance import candlestick_ohlc
 import technical_indicators as ti
 
 
@@ -67,12 +70,25 @@ def rel_plot(df):
 def ma_plot(df1, df2):
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close", "MA"]
-
+    
     df2 = df2.reset_index()
     df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    ax = df1.plot(x='Date', y='MA')
-    df2.plot(ax=ax, x='Date', y='MA')
+    #ax = df1.plot(x='Date', y='MA')
+    #df2.plot(ax=ax, x='Date', y='MA')
+    
+    ohlc = df1
+    ohlc['Date'] = ohlc['Date'].map(mdates.date2num)
+    
+    f1 = plt.subplot2grid((6, 4), (1, 0), rowspan=6, colspan=4, axisbg='#07000d')
+    candlestick_ohlc(f1, df.values, width=.6, colorup='#53c156', colordown='#ff1717')
+    f1.xaxis_date()
+    f1.xaxis.set_major_formatter(mdates.DateFormatter('%y-%m-%d %H:%M:%S'))
+    
+    plt.xticks(rotation=45)
+    plt.ylabel('Stock Price')
+    plt.xlabel('Date Hours:Minutes')
+    plt.show()
 
 
 
