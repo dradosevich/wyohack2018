@@ -1,2 +1,21 @@
 This folder will contain all the work done for the "Best for Wyoming"
 competition
+
+Initial thought: Currently supply chains are kept within the specific companies,
+leading to a lack of transparency and loss of revenue.
+Research: Blockchain use in Wyoming, how it functions, companies using
+Finger printing  the oil to determine quality, per day?
+Oil down pipeline per hour, finger print each hour to check
+Origin, mixture dilution
+Coal - 2/5
+'While coal is dying, blockchain would help maximize profits to help safeguard Wyoming'
+Natural Gas shipped out through pipelines used in 3/5 households for heating
+Natural gas in top five, coal >=1/3 of nation's
+Seven of the 10 largest U.S. coal mines are located in Wyoming's Powder River Basin
+Coal: 40% of U.S. production
+ In 2013, Wyoming’s nonenergy mineral production was valued at over $2.26 billion.
+ Notably, Wyoming produces more trona (the chief source of soda ash) than any other state,
+ and the largest deposit of trona in the world sits under Sweetwater County in Wyoming.
+
+ The U.S. Energy Information Administration (EIA) cannot identify the origin of gasoline
+sold at fueling stations. The gasoline a company sells is not necessarily produced by that company.
