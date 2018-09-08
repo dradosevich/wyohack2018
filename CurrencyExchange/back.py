@@ -39,6 +39,12 @@ def update_history(days, num_points, curr1, curr2):
     df_rel = df_rel.rename(index=str, columns = {0: 'time', 1: 'price'})
     return df_rel
 
+def get_currency_pairs():
+    url = "http://coincap.io/coins"
+    jdata = requests.get(url).json()
+    currency_list = json.loads(jdata)
+    return currency_list
+
 
 def compare(df, curr1, curr2):
     price1 = df.loc[df['long'] == curr1]
@@ -86,6 +92,18 @@ def convert_data(df, timeframe):
 
     return data_ohlc
 
+def ma_crossover(slow_ma, fast_ma):
+    print(slow_ma.iloc[4,0])
+    if fast_ma.iloc[4,0] < slow_ma.iloc[4,0] and fast_ma.iloc[4,1] > slow_ma.iloc[4,1]:
+        #upward ma_crossover, buy signal
+        return "buy"
+    elif fast_ma.iloc[4,0] > slow_ma.iloc[4,0] and fast_ma.iloc[4,1] < slow_ma.iloc[4,1]:
+        #downward ma_crossover, sell signal
+        return "sell"
+    else:
+        return "none"
+
+
 if __name__ == '__main__':
     url = "http://coincap.io/front"
     df = update_front(url)
@@ -100,3 +118,10 @@ if __name__ == '__main__':
     #print(ma_df)
 
     ma_plot(slow_ma, fast_ma)
+
+    #this will go in a loop of some sort
+    # result = ma_crossover(slow_ma, fast_ma)
+    # if result is "buy" or "sell":
+    #     #save cypto pair in list or some such
+    # else:
+    #     continue
