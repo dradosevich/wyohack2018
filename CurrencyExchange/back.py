@@ -82,9 +82,9 @@ if __name__ == '__main__':
     relative_df = update_history(1, 100, 'BTC', 'DOGE')
     rel_plot(relative_df)
     
-    converted_data = convert_data(relative_df, '5Min')
+    converted_data = convert_data(relative_df, '15Min')
     #print(converted_data)
     slow_ma = ma(converted_data, 20)
     fast_ma = ma(converted_data, 10)
-    #print(ma_df)
+    print(ma_df)
     
