@@ -14,6 +14,12 @@ import technical_indicators as ti
 import csv
 
 
+dai_down = False
+    
+#Store dai history in memory
+dai_df = []
+
+
 #Request updated info
 def update_front(url):
     jdata = requests.get(url).json()
@@ -22,7 +28,7 @@ def update_front(url):
 
 
 #Update historical data
-def update_history(days, num_points, curr1, curr2, dai_down):
+def update_history(days, num_points, curr1, curr2):
     base_url = "http://coincap.io/history/"
     url = base_url + str(days) + "day/"
     
@@ -149,12 +155,6 @@ def compare_all():
         print(pair)
 
 if __name__ == '__main__':
-    #Global variable to indicate if dai is downloaded or not
-    global dai_down
-    dai_down = False
-    
-    #Store dai history in memory
-    global dai_df
     
     
     #url = "http://coincap.io/front"
