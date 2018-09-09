@@ -14,6 +14,7 @@ import technical_indicators as ti
 import csv
 import sys
 import datetime
+import os
 
 
 #Indicate whether dai is in memory
@@ -190,9 +191,9 @@ def compare_all(base_currency, test_type, download, days):
         if test_type is 1:
             result = ma_crossover(ohlc_data)
         elif test_type is 2:
-            result = macd_data(ohlc_data)
+            result = macd(ohlc_data)
         else:
-            result = ma_crossover(ohlc_data) + macd_data(ohlc_data)
+            result = ma_crossover(ohlc_data) + macd(ohlc_data)
             if result is -2:
                 result = -1
             elif result is 2:
@@ -235,7 +236,7 @@ def save_data(days):
             url_curr = url + curr
             jdata1 = requests.get(url_curr).json()
             df_curr = pd.DataFrame(jdata1['price'])
-            df_curr.to_csv('./Data/' + curr + str(days) + '.csv', sep='\t')
+            df_curr.to_csv('./Data/' + curr + '.csv', sep='\t')
             saved_curr.append(curr)
             list_files = curr + str(days) + '.csv'
             print(curr)
@@ -249,6 +250,12 @@ def save_data(days):
     return saved_curr, not_saved_curr, list_files
 
 if __name__ == '__main__':
+    charts = os.listdir("Charts")
+    for chart in charts:
+        try:
+            os.remove(chart)
+        except:
+            continue
     days = 90
     test_type = int(sys.argv[1])
     base_currency = sys.argv[2]
