@@ -25,9 +25,9 @@
    <children>
       <Pane prefHeight="515.0" prefWidth="870.0" style="-fx-background-color: #44414C;">
          <children>
-            <JFXTextField fx:id="tag" id="id" layoutX="34" layoutY="38.0" prefHeight="35.0" prefWidth="185" style="-fx-background-color: #ceffce;" text="DAI"/>
-            <ComboBox fx:id="indics" id="indics" layoutX="227" layoutY="38.0" prefHeight="35.0" prefWidth="60" style="-fx-background-color: #ceffce;" />
-            <JFXButton fx:id="refresh_button" layoutX="296.0" layoutY="38.0" onMouseClicked="#enter" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: lightgreen;" text="GO" />
+            <JFXTextField fx:id="tag" id="id" layoutX="34" layoutY="38.0" prefHeight="40.0" prefWidth="165" style="-fx-background-color: #ceffce;" text="DAI"/>
+            <ComboBox fx:id="indics" id="indics" layoutX="207" layoutY="38.0" prefHeight="40.0" prefWidth="80" style="-fx-background-color: #ceffce;" />
+            <JFXButton fx:id="refresh_button" layoutX="296.0" layoutY="38.0" onMouseClicked="#enter" prefHeight="40.0" prefWidth="35.0" style="-fx-background-color: lightgreen;" text="GO" />
             <TableView id="t_view" fx:id="t_view" layoutX="34.0" layoutY="91.0" onMouseClicked="#highlightRow" prefHeight="389.0" prefWidth="297.0" style="-fx-background-color: silver;">
               <columns>
                  <TableColumn id="coin_col" fx:id="coin_col" prefWidth="75.0" text="Coin" />
@@ -35,6 +35,7 @@
                  <TableColumn id="val_col" fx:id="val_col" prefWidth="146.0" text="Val" />
               </columns>
             </TableView>
+            <JFXTextField fx:id="bos" id="bos" layoutX="352" layoutY="38" prefWidth="500" prefHeight="40" />
             <Pane layoutX="352.0" layoutY="91.0" prefHeight="389.0" prefWidth="500.0" style="-fx-background-color: lightgreen;">
                <children>
                   <JFXSpinner fx:id="spinner" layoutX="415.0" layoutY="308.0" />

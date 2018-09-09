@@ -21,10 +21,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+import static javafx.geometry.Pos.CENTER;
+
 public class Controller {
     public JFXTextField tag;
     public JFXSpinner spinner;
-    public ComboBox indics;
+    public ComboBox<String> indics;
+    public JFXTextField bos;
     private Stage stage;
     private Scene scene;
     private Group group;
@@ -43,9 +46,6 @@ public class Controller {
 
     @FXML
     private ImageView image_view;
-
-    //@FXML
-    //private ComboBox<String> indics;
 
     void setStage(Stage s) {
         stage = s;
@@ -86,11 +86,9 @@ public class Controller {
     }
 
     void initializeCB() {
-        //indics = new ComboBox<>();
-        //indics.getItems().clear();
-        for(int i = 1; i <= 10; i++) {
-            indics.getItems().add(Integer.toString(i));
-        }
+        indics.getItems().add("I-1");
+        indics.getItems().add("I-2");
+        indics.getItems().add("Both");
         System.out.println("items: " + indics.getItems().toString());
         indics.getSelectionModel().select(2);
         group.getChildren().add(indics);
@@ -102,16 +100,6 @@ public class Controller {
     @FXML
     public void initialize() {
         tag.setPadding(new Insets(7));
-//        indics = new ComboBox<>();
-//        for(int i = 1; i <= 10; i++) {
-//            indics.getItems().add(Integer.toString(i));
-//        }
-//        System.out.println("items: " + indics.getItems().toString());
-//        indics.getSelectionModel().select(3);
-//        HBox hbox = new HBox(indics);
-
-
-
         coin_col.setCellValueFactory(new PropertyValueFactory<>("Coin"));
         buy_col.setCellValueFactory(new PropertyValueFactory<>("Buy"));
         val_col.setCellValueFactory(new PropertyValueFactory<>("Val"));
@@ -124,15 +112,30 @@ public class Controller {
         t_view.getItems().removeAll();
         t_view.getItems().clear();
         t_view.refresh();
+
         System.out.println("#Children: " + group.getChildren().size());
-        if(group.getChildren().size() > 2) {
-            group.getChildren().remove(1, group.getChildren().size() - 1);
-            //group.getChildren().add(indics);
-            stage.setScene(scene);
-            stage.show();
+        group.getChildren().remove(bos);
+        group.getChildren().remove(image_view);
+        System.out.println("#Children: " + group.getChildren().size());
+
+        stage.setScene(scene);
+        stage.show();
+
+        String drop = indics.getSelectionModel().getSelectedItem();
+        String i;
+        switch (drop) {
+            case "I-1":
+                i = "1";
+                break;
+            case "I-2":
+                i = "2";
+                break;
+            default:
+                i = "3";
+                break;
         }
 
-        String command = "python .\\back.py " + indics.getSelectionModel().getSelectedItem().toString() + " " + tag.getText() + " 0";
+        String command = "python .\\back.py " + i + " " + tag.getText() + " 0";
         System.out.println("Command: " + command);
 
         System.out.print("Calling Process...");
@@ -152,6 +155,17 @@ public class Controller {
     @FXML
     public void highlightRow() throws IOException {
         if(t_view.getSelectionModel().getSelectedItem() == null) {return; }
+        String bs = t_view.getSelectionModel().getSelectedItem().getBuy();
+        group.getChildren().remove(bos);
+        bos.setAlignment(CENTER);
+        bos.setEditable(false);
+        if(bs.equalsIgnoreCase("buy")) {
+            bos.setText("BUY");
+            bos.setStyle("-fx-background-color: #22a522;" + "-fx-font-size: 18px;" + "-fx-font-weight: bold;" + "-fx-text-fill: white;");
+        } else {
+            bos.setText("SELL");
+            bos.setStyle("-fx-background-color: #db1515;" + "-fx-font-size: 18px;" + "-fx-font-weight: bold;" + "-fx-text-fill: white;");
+        }
 
         String name = t_view.getSelectionModel().getSelectedItem().getCoin();
         String current = new java.io.File( "." ).getCanonicalPath();
@@ -170,6 +184,7 @@ public class Controller {
         image_view.setVisible(true);
         image_view.setCache(true);
 
+        group.getChildren().add(bos);
         group.getChildren().add(image_view);
         stage.setScene(scene);
         stage.show();
