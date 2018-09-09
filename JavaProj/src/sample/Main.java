@@ -15,9 +15,8 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = loader.load();
         Group group = new Group(root);
-        Scene scene = new Scene(group, 975, 950);
+        Scene scene = new Scene(group, 870, 515);
 
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Currency Exchange");
         primaryStage.setScene(scene);
         primaryStage.setMaxHeight(1530);

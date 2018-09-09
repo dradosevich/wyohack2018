@@ -1,6 +1,9 @@
 package sample;
 
+import com.jfoenix.controls.JFXSpinner;
+import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
@@ -18,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Controller {
+    public JFXTextField tag;
+    public JFXSpinner spinner;
     private Stage stage;
     private Scene scene;
     private Group group;
@@ -36,7 +41,6 @@ public class Controller {
 
     @FXML
     private ImageView image_view;
-
 
     void setStage(Stage s) {
         stage = s;
@@ -74,35 +78,48 @@ public class Controller {
             e.printStackTrace();
         }
 
-
     }
 
     @FXML
     public void initialize() {
-    coin_col.setCellValueFactory(new PropertyValueFactory<>("Coin"));
-    buy_col.setCellValueFactory(new PropertyValueFactory<>("Buy"));
-    val_col.setCellValueFactory(new PropertyValueFactory<>("Val"));
-    //Runtime.getRuntime().exec("python back.py");
-    getData();
+        tag.setPadding(new Insets(7));
+        coin_col.setCellValueFactory(new PropertyValueFactory<>("Coin"));
+        buy_col.setCellValueFactory(new PropertyValueFactory<>("Buy"));
+        val_col.setCellValueFactory(new PropertyValueFactory<>("Val"));
+        spinner.setVisible(false);
+        //getData();
     }
 
 
     @FXML
-    public void refresh() throws IOException {
+    public void enter() throws IOException {
+        t_view.getItems().removeAll();
         t_view.getItems().clear();
-       Runtime.getRuntime().exec("python .\\back.py 3 DAI 0");
-//       System.out.println("Waiting");
-//        try {
-//            TimeUnit.SECONDS.sleep(45);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(("Done Waiting"));
+        t_view.refresh();
+        if(group.getChildren().size() > 1)
+          group.getChildren().remove(1,group.getChildren().size()-1);
+
+        String command = "python .\\back.py 3 " + tag.getText() + " 0";
+        System.out.println("Command: " + command);
+
+        spinner.setVisible(true);
+        System.out.print("Calling Process...");
+        Process proc = Runtime.getRuntime().exec(command);
+        try {
+            proc.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Done!");
+        spinner.setVisible(false);
+
         getData();
     }
 
     @FXML
     public void highlightRow() throws IOException {
+        if(t_view.getSelectionModel().getSelectedItem() == null) {return; }
+
         String name = t_view.getSelectionModel().getSelectedItem().getCoin();
         String current = new java.io.File( "." ).getCanonicalPath();
 

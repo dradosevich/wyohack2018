@@ -6,9 +6,9 @@ import javafx.beans.property.StringProperty;
 
 public class User extends RecursiveTreeObject<User> {
 
-    StringProperty userName;
-    StringProperty age;
-    StringProperty department;
+    private StringProperty userName;
+    private StringProperty age;
+    private StringProperty department;
 
     public User(String department, String age, String userName) {
         this.department = new SimpleStringProperty(department);
