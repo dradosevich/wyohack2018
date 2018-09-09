@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+  
+  
+  
+      .mainWindow{
+        overflow: hidden;
+        position:fixed;
+        height: 100%;
+        width: 100%;
+        transition: 0.6s;
+      }
+      
+      .dataContent{
+        verflow-y:scroll;
+        position:center;
+        height: 100%;
+        margin-left:48px;
+        margin-right: 0px;
+        background-color: #596070;
+        transition: 0.6s;
+      }
+      
+      
+      .menuBar {
+        position: fixed;
+        height: 120%;
+        width: 48px;
+        background-color: #6d7993;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transition: 0.6s;
+        overflow: hidden;
+        padding-top: 0px;
+      }
+      
+      .searchBar{
+        position: absolute;
+        height: 120%;
+        width: 0%;
+        background-color: #96858f;
+        transition: 0.6s;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin-left: 0;
+        text-align: center;
+        padding-top: 15%
+      }
+      
+      
+      input:focus{
+        outline:none;
+      }
+      .searchInput input[type=text]{
+        width: 90%;
+        margin: auto;
+        font-size: 40px;
+        border-radius: 20px;
+        border-color: rgba(255,255,255,0);
+        background-color: rgba(255,255,255,0.4);
+        padding-left: 20px;
+      }
+      
+      .searchButton{
+        background-image: url('Icons/search.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        position: absolute;
+        height: 48px;
+        width: 48px;
+        cursor: pointer;
+        margin-top: 48px;
+        border: 1px solid rgba(213,213,213,0);
+      }
+      
+      
+      
+      .settingsButton{
+        background-image: url('Icons/settings.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        position: absolute;
+        height: 48px;
+        width: 48px;
+        cursor: pointer;
+        margin-top: 0px;
+        border: 1px solid rgba(213,213,213,0);
+      }
+      
+      
+      .settingsBar{
+        position: absolute;
+        height: 120%;
+        width: 0%;
+        background-color: #6d7993;
+        transition: 0.6s;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+        padding-top: 20px;
+      }
+      
+      .settingMenu{
+        width: 100%;
+        height: 100%;
+        margin: auto;
+        /*background-color: yellow;*/
+      }
+      
+      .updateButton{
+        width: 90%;
+        height: 6%;
+        background-color: #96858f;
+        margin:auto ;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 3px;
+        border-color: #6d7993;
+        transition: 0.6s;
+        text-align: center;
+      }
+      
+      
+      .spacer{
+        width: 90%;
+        height: 2%;
+      }
+
+      
+      select{
+        color:#6d7993;
+        width: 90%;
+        font-size: 25px;
+        background-color:#6d7993;
+        border-width: 3px;
+        border-color: #6d7993;
+        outline-color: #c19c08;
+        transition: 0.6s;
+      }
+      
+      
+      body{
+        margin: 0px;
+      }
+
+    </style>
+
+  </head>
+  
+  <script>
+
+      var shell = require('shelljs');
+      var $ = jQuery = require('jquery');
+      var d3 = require('d3');
+      var amountToShow = 0;
+      var scan_data = new Array()
+      button_states = {search_clicked: false,
+                       settings_clicked: false};
+  
+      sidebar_states = {search_active: false,
+                        settings_active: false};
+  
+      analysis_types = {t1: false,
+                        t2: false,
+                        t3: false};
+      var itemID = 0; //helps keep track of elements
+      var elems = new Array();
+      var capElms = new Array();
+
+
+      function clearGrid() //empties the grid and the elements in the array
+      {
+
+        for(var i=0; i <elems.length; i++)
+        {
+          var toRemove = document.getElementById(elems[i]);
+          toRemove.parentNode.removeChild(toRemove);
+        }
+        for(var i=0; i <capElms.length; i++)
+        {
+          var toRemove = document.getElementById(capElms[i]);
+          toRemove.parentNode.removeChild(toRemove);
+        }
+
+        elems = [];
+        capElms = [];
+      }
+
+      function populate(command)
+      {
+        clearGrid()
+
+        var amountToShow = document.getElementById("quantity").value
+
+        shell.config.execPath = '/usr/local/bin/node'
+
+        if(shell.exec(command).code == 0)
+        {
+          d3.csv("Market.csv").then(function(data) {
+          // access by index and property
+            if(data.length == 0)
+            {
+              document.getElementById("message").innerHTML = "No Scan Data Yet -- Search It Up!"
+              document.getElementById("message").style.marginTop = "20%"
+            }
+            else if(amountToShow === "max")
+            {
+              for(var i = 0; i < data.length; i++)
+              {
+                var cap = "";
+                cap = data[i]["Pair"]+ " " + data[i]["Signal"]+ " "+ data[i]["Price"];
+                if(data[i]["Signal"] === "buy")
+                {
+                  addToGrid(cap,1, data[i]["Pair"]);
+                }
+                else
+                {
+                  addToGrid(cap,2,data[i]["Pair"]);
+                }
+                
+              }
+            }
+            else
+            {
+              for(var i = 0; i < amountToShow; i++)
+              {
+                var cap = "";
+                cap = data[i]["Pair"]+ " " + data[i]["Signal"] + " "+ data[i]["Price"];
+                console.log(cap)
+                if(data[i]["Signal"] === "buy")
+                {
+                  addToGrid(cap, 1, data[i]["Pair"]);
+                }
+                else
+                {
+                  addToGrid(cap, 2, data[i]["Pair"]);
+                }
+              }
+            }
+
+          });
+        }
+        else
+        {
+          window.alert("ERROR: No Local Data Found! Please Perform a Refresh")
+        }
+      }
+
+
+      function addToGrid(data,color,name)
+      {
+        var b_color = ""
+        if(color === 1)
+        {
+          b_color = "#699F4C";
+        }
+        else if(color === 2)
+        {
+          b_color = "#bb1d25";
+        }
+
+        var id = "data"+ itemID;
+        var capID = "cap"+itemID;
+        itemID++;
+        var div = document.getElementById('grid');
+        var img_path = "Charts/" + name +".png"
+        div.innerHTML += "<img src=" + img_path + " id= "+ id+">"+
+        "<div style='color: #D5D5D5; border-color: #D5D5D5; border-width: 2px; border-style: solid; border-radius: 5px; margin-top: 10px; margin-bottom: 100px;  width: 70%; font-size: 24px; background-color: " + b_color + ";' id="+capID+">" + data + "</div></img>" 
+
+        elems.push(id);
+        capElms.push(capID);
+        
+      }
+
+      function Highlighted(event,type,x)
+      {
+        var src_elem = event.target.id
+        if(src_elem == "search_button" && button_states.search_clicked){return;}
+        else if(src_elem == "settings_button" && button_states.settings_clicked){return}
+        if(x == 1 && type == 1)
+        {
+          event.target.style.transition = "0.8s";
+          event.target.style.backgroundImage = "url('Icons/searchHighlighted.png')";
+        }
+        else if(x == 0 && type == 1)
+        {
+          event.target.style.transition = "0.4s";
+          event.target.style.backgroundImage = "url('Icons/search.png')";
+        }
+        else if(x == 1 && type == 2)
+        {
+          event.target.style.transition = "0.4s";
+          event.target.style.backgroundImage = "url('Icons/settingsHighlighted.png')";
+        }
+        else if(x == 0 && type == 2)
+        {
+          event.target.style.transition = "0.4s";
+          event.target.style.backgroundImage = "url('Icons/settings.png')";
+        }
+        else if(x == 1 && type == 3)
+        {
+          event.target.style.backgroundColor = "red";
+        }
+        else if(x == 0 && type == 3)
+        {
+          event.target.style.backgroundColor = "#96858f";
+        }
+      }
+
+
+      function rgbTorgba(rgb,a)
+      {
+  
+        var start = rgb.indexOf("(")
+        var end = rgb.indexOf(")")
+        var vals = rgb.slice(start + 1,end)
+  
+        var rgba = "rgba(" + vals + ", " + a + ")"
+  
+        return rgba
+      }
+
+      function setMargin(style)
+      {
+        console.log("SET");
+        style.margin = "0%";
+        return;
+      }
+
+      function ShiftContent(val)
+      {
+        var main_content_style = document.getElementById("data_content").style;
+        if(val == 1)
+        {
+          main_content_style.marginLeft = "35%"
+        }
+        else if(val == 0)
+        {
+          main_content_style.marginLeft = "0%"
+        }
+      }
+
+
+      function OnSearchClick()
+      {
+  
+        var search_button = document.getElementById("search_button");
+  
+        if(!button_states.search_clicked)
+        {
+          search_button.style.backgroundImage = "url('Icons/searchSelected.png')";
+          button_states.search_clicked = true;
+        }
+        else
+        {
+          search_button.style.backgroundImage = "url('Icons/search.png')";
+          button_states.search_clicked = false;
+        }
+  
+        ToggleSearchBar();
+    }
+
+      function Search(event)
+      {
+        //console.log(event.keyCode)
+        if(event.keyCode == 13)
+        {
+          var searchbar_style = document.getElementById("search_bar").style;
+          var search_button_style = document.getElementById("search_button").style;
+          searchbar_style.width = "0%";
+          search_button_style.backgroundImage = "url('Icons/search.png')";
+          button_states.search_clicked = false;
+          sidebar_states.search_active = false;
+          var test_type = document.getElementById("stats").value;
+          var search_data = document.getElementById("search_input_text").value;
+          var command = 'python3 back.py ' + test_type + " " + search_data + " 0"
+          document.getElementById("message").innerHTML = ""
+          document.getElementById("message").style.marginTop = "5%"
+
+          populate(command)
+
+        }
+      }
+
+      function OnSettingsClick()
+      {
+  
+        var settings_button = document.getElementById("settings_button");
+  
+        if(!button_states.settings_clicked)
+        {
+          settings_button.style.backgroundImage = "url('Icons/settingsSelected.png')";
+          button_states.settings_clicked = true;
+        }
+        else
+        {
+          settings_button.style.backgroundImage = "url('Icons/settings.png')";
+          button_states.settings_clicked = false;
+        }
+  
+        ToggleSettingsBar();
+    }
+
+
+      function ToggleSettingsBar()
+      {
+        var menubar_style = document.getElementById("menu_bar").style;
+        var settingsbar_style = document.getElementById("settings_bar").style;
+        var searchbar_style = document.getElementById("search_bar").style;
+        var selector_style = document.getElementById("stats").style;
+        var updatebutton_style = document.getElementById("update_cache").style;
+        var selector2_style = document.getElementById("quantity").style;
+  
+        if(!sidebar_states.settings_active && !sidebar_states.search_active)
+        {
+          settingsbar_style.width = "35%";
+          menubar_style.marginLeft = "35%";
+          ShiftContent(1);
+          selector_style.borderColor = "#D5D5D5";
+          selector_style.color = "#D5D5D5";
+          updatebutton_style.borderColor = "#D5D5D5";
+          updatebutton_style.backgroundColor = "#96858f";
+          selector2_style.borderColor = "#D5D5D5";
+          selector2_style.color = "#D5D5D5";
+          sidebar_states.settings_active = true;
+        }
+        else if(sidebar_states.settings_active && !sidebar_states.search_active)
+        {
+          settingsbar_style.width = "0";
+          menubar_style.marginLeft = "0";
+          ShiftContent(0);
+          selector_style.borderColor = "#6d7993";
+          selector_style.color = "#6d7993";
+          updatebutton_style.borderColor = "#6d7993";
+          updatebutton_style.backgroundColor = "#6d7993";
+          selector2_style.borderColor = "#6d7993";
+          selector2_style.color = "#6d7993";
+          sidebar_states.settings_active = false;
+        }
+        else if(!sidebar_states.settings_active && sidebar_states.search_active)
+        {
+          settingsbar_style.width = "35%";
+          menubar_style.marginLeft = "35%";
+          searchbar_style.width = "calc(100% - (35% + 48px))"
+          selector_style.borderColor = "#D5D5D5";
+          selector_style.color = "#D5D5D5";
+          updatebutton_style.borderColor = "#D5D5D5";
+          updatebutton_style.backgroundColor = "#96858f";
+          selector2_style.borderColor = "#D5D5D5";
+          selector2_style.color = "#D5D5D5";
+          sidebar_states.settings_active = true;
+        }
+        else if(sidebar_states.settings_active && sidebar_states.search_active)
+        {
+          settingsbar_style.width = "0%";
+          menubar_style.marginLeft = "0%";
+          searchbar_style.width = "calc(100% - 48px)"
+          selector_style.borderColor = "#6d7993";
+          selector_style.color = "#6d7993";
+          updatebutton_style.borderColor = "#6d7993";
+          updatebutton_style.backgroundColor = "#6d7993";
+          selector2_style.borderColor = "#6d7993";
+          selector2_style.color = "#6d7993";
+          sidebar_states.settings_active = false;
+        }
+      }
+
+
+      function ToggleSearchBar()
+      {
+        var searchbar = document.getElementById("search_bar");
+        var searchbar_style = searchbar.style;
+        var menu_bar_style = document.getElementById("menu_bar").style;
+  
+  
+        if(!sidebar_states.search_active && !sidebar_states.settings_active)
+        {
+          searchbar_style.width = "calc(100% - 48px)";
+          sidebar_states.search_active = true;
+        }
+        else if(sidebar_states.search_active && !sidebar_states.settings_active)
+        {
+          searchbar_style.width = "0%";
+          sidebar_states.search_active = false;
+        }
+        else if(!sidebar_states.search_active && sidebar_states.settings_active)
+        {
+          searchbar_style.width = "calc(100% - (35% + 48px))";
+          sidebar_states.search_active = true;
+        }
+        else if(sidebar_states.search_active && sidebar_states.settings_active)
+        {
+          searchbar_style.width = "0%";
+          sidebar_states.search_active = false;
+        }
+        else
+        {
+          console.Log("Why are we here?");
+        }
+      }
+
+      function SetAnalysis(val)
+      {
+        if(val == 1){analysis_types.t1 = true;}
+        else if(val == 2){analysis_types.t2 = true;}
+        else if(val == 3){analysis_types.t3 = true;}
+      }
+
+      function Refresh()
+      {
+
+        // FIX REFRESH !!!
+        // 
+        // 
+        window.alert("WARNING: This Operation May Take A While To Complete!")
+  
+        // CALL PYTHON CODE HERE (WITH REFERSH)
+        shell.config.execPath = '/usr/local/bin/node'
+        var test_type = document.getElementById("stats").value;
+        var search_data = document.getElementById("search_input_text").value;
+        var command = 'python3 back.py ' + test_type + " " + search_data + " 1"
+
+        populate(command)
+      }
+
+
+    </script>
+
+  <body onload="populate('python3 dummy.py')">
+  
+    <div id="main_w" class="mainWindow">
+  
+  
+      <div id="menu_bar" class="menuBar">
+  
+  
+        <div id="settings_button" class="settingsButton"
+                             onmouseenter="Highlighted(event,2,1)"
+                             onmouseleave="Highlighted(event,2,0)"
+                             onclick="OnSettingsClick()">
+        </div>
+  
+        <div id="search_button" class="searchButton"
+                             onmouseenter="Highlighted(event,1,1)"
+                             onmouseleave="Highlighted(event,1,0)"
+                             onclick="OnSearchClick()">
+        </div>
+  
+      </div>
+  
+      <div id="data_content" class="dataContent" style="overflow: scroll;">
+        <!-- Area loaded in by Wyatt's python-->
+        <center id="grid">
+          <div id="message" style="color: #D5D5D5; font-size: 48px; margin-top: 20%;">No Scan Data Yet -- Search It Up!</div>
+        </center>
+      </div>
+  
+      <div id="search_bar" class="searchBar">
+  
+        <div id="search_input" class="searchInput">
+          <input id="search_input_text" type="text" placeholder="Enter Crypto..." onkeypress="Search(event)">
+        </div>
+  
+      </div>
+  
+  
+  
+      <div id="settings_bar" class="settingsBar">
+        <div id="settings_menu" class="settingMenu">
+  
+  
+          <select id="stats">
+            <option value="3" onclick="SetAnalysis(1)">MAC & MAC-D</option>
+            <option value="2" onclick="SetAnalysis(2)">MAC-D</option>
+            <option value="1" onclick="SetAnalysis(3)">Moving Average Crossover</option>
+          </select>
+  
+          <div id="spacer1" class="spacer"></div>
+  
+          <select id="quantity" onchange="populate()">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="max">Max</option>
+          </select>
+  
+          <div id="spacer1" class="spacer"></div>
+  
+          <div id="update_cache" class="updateButton" onclick="Refresh()"
+                                                      onmouseenter="Highlighted(event,3,1)  "
+                                                      onmouseleave="Highlighted(event,3,0)  ">
+            <img src="Icons/refresh.png" style="width: 10%; height: 100%">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    
+  </body>
+</html>
