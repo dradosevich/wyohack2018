@@ -69,6 +69,7 @@ public class Controller {
         System.out.println("#Children: " + group.getChildren().size());
     }
 
+    @FXML
     void refresh_lite() {
         group.getChildren().remove(image_view);
         group.getChildren().remove(bos);
@@ -120,26 +121,23 @@ public class Controller {
         buy_col.setCellValueFactory(new PropertyValueFactory<>("Buy"));
         val_col.setCellValueFactory(new PropertyValueFactory<>("Val"));
         spinner.setVisible(false);
+        bos.setEditable(false);
     }
 
 
     @FXML
-    public void enter() throws IOException, InterruptedException {
+    public void enter() throws IOException {
         if(tag.getText().equals("")){
             return;
         }
-        t_view.getItems().removeAll();
-        t_view.getItems().clear();
-        t_view.refresh();
+        Runnable runner = new Runnable();
+        runner.setController(this);
+        runner.run();
 
-        System.out.println("#Children: " + group.getChildren().size());
-        group.getChildren().remove(bos);
-        group.getChildren().remove(image_view);
-        System.out.println("#Children: " + group.getChildren().size());
+        runPython();
+    }
 
-        stage.setScene(scene);
-        stage.show();
-
+    private void runPython() throws IOException {
         String drop = indics.getSelectionModel().getSelectedItem();
         String i;
         switch (drop) {
@@ -157,15 +155,12 @@ public class Controller {
         String command = "python .\\back.py " + i + " " + tag.getText() + " 0";
         System.out.println("Command: " + command);
 
-        System.out.print("Calling Process...");
         Process proc = Runtime.getRuntime().exec(command);
-        spinner.setVisible(true);
         try {
             proc.waitFor();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        spinner.setVisible(false);
         System.out.println("Done!");
 
         getData();

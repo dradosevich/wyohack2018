@@ -25,8 +25,8 @@
    <children>
       <Pane prefHeight="515.0" prefWidth="870.0" style="-fx-background-color: #44414C;">
          <children>
-            <JFXTextField fx:id="tag" id="id" layoutX="34" layoutY="38.0" prefHeight="40.0" prefWidth="165" style="-fx-background-color: #ceffce;" text="DAI"/>
-            <ComboBox fx:id="indics" id="indics" layoutX="207" layoutY="38.0" prefHeight="40.0" prefWidth="80" style="-fx-background-color: #ceffce;" />
+            <JFXTextField fx:id="tag" id="id" layoutX="34" layoutY="38.0" prefHeight="40.0" prefWidth="165" style="-fx-background-color: #ceffce;" text="DAI" onMouseClicked="#refresh_lite" />
+            <ComboBox fx:id="indics" id="indics" layoutX="207" layoutY="38.0" prefHeight="40.0" prefWidth="80" style="-fx-background-color: #ceffce;" onMouseClicked="#refresh_lite" />
             <JFXButton fx:id="refresh_button" layoutX="296.0" layoutY="38.0" onMouseClicked="#enter" prefHeight="40.0" prefWidth="35.0" style="-fx-background-color: lightgreen;" text="GO" />
             <TableView id="t_view" fx:id="t_view" layoutX="34.0" layoutY="91.0" onMouseClicked="#highlightRow" prefHeight="389.0" prefWidth="297.0" style="-fx-background-color: silver;">
               <columns>
