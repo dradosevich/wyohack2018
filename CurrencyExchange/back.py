@@ -253,7 +253,7 @@ if __name__ == '__main__':
     charts = os.listdir("Charts")
     for chart in charts:
         try:
-            os.remove(chart)
+            os.remove(os.path.join("Charts", chart))
         except:
             continue
     days = 90
