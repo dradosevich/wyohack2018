@@ -160,7 +160,6 @@ def macd(ohlc_data):
     fast_ma = 8
 
     macd_data = ti.macd(ohlc_data, fast_ma, slow_ma).tail(2)
-    print(macd_data)
     if macd_data.iloc[0,6] < 0 and macd_data.iloc[1,6] > 0:
         return "buy"
     elif macd_data.iloc[0,6] > 0 and macd_data.iloc[1,6] < 0:
@@ -175,8 +174,8 @@ def compare_all():
     sell_list = []
     fileout = "Market.csv"
     outfile = open(fileout, 'w', newline='')
-    crypto_writer = csv.writer(outfile, delimiter=',', fieldnames= ["Pair", "Signal", "Price"])
-    crypto_writer.writeheader()
+    crypto_writer = csv.writer(outfile, delimiter=',')
+    crypto_writer.writerow(['Pair','Signal', "Price"])
     for symbol in all_symbols:
         crypto_pair = "DAI" + symbol[0]
         try:
