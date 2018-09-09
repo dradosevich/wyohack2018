@@ -122,7 +122,6 @@ def ma_plot(df1, df2):
     """
 
 
-
 def ma(df, n):
     ma_df = ti.moving_average(df, n)
     return ma_df
@@ -152,20 +151,6 @@ def ma_crossover(ohlc_data):
     else:
         return "none"
 
-def relative_strength_index(ohlc_data):
-    RSI_k = 14
-    overbought_val = 70
-    oversold_val = 30
-
-    rsi_data = ti.relative_strength_index(ohlc_data, RSI_k).tail(1)
-
-    print(rsi_data)
-    if(rsi_data.iloc[0,4] > overbought_val):
-        return "sell"
-    elif (rsi_data.iloc[0,4] < oversold_val):
-        return "buy"
-    else:
-        return "none"
 
 def macd(ohlc_data):
     slow_ma = 15
@@ -238,9 +223,9 @@ def save_data(filename, days):
     return saved_curr, not_saved_curr
 
 if __name__ == '__main__':
-    # df_rel = update_history(1, 20, "BTC", "DOGE")
-    # ohlc_df = format_as_ohlc(df_rel, "5Min")
-    # ma_df = ma(ohlc_df, 10)
-    # ma_plot(ma_df, df_rel)
+    df_rel = update_history(1, 20, "BTC", "DOGE")
+    ohlc_df = format_as_ohlc(df_rel, "5Min")
+    ma_df = ma(ohlc_df, 10)
+    ma_plot(ma_df, df_rel)
 
-    compare_all()
+    #compare_all()
