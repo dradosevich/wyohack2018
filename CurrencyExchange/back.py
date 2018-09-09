@@ -41,14 +41,15 @@ def update_history(days, num_points, curr1, curr2):
     if dai_down is False:
         url1 = url + curr1
         jdata1 = requests.get(url1).json()
-        df1 = pd.DataFrame(jdata1['price'][-num_points:])
+        df1 = pd.DataFrame(jdata1['price'])#[-num_points:])
+        #print(df1.tail())
         global dai_df
         dai_df = df1
         dai_down = True
 
     url2 = url + curr2
     jdata2 = requests.get(url2).json()
-    df2 = pd.DataFrame(jdata2['price'][-num_points:])
+    df2 = pd.DataFrame(jdata2['price'])#[-num_points:])
 
     df1 = dai_df
 
@@ -85,43 +86,31 @@ def rel_plot(df):
 
 
 def ma_plot(df1, df2):
-
+    #print(df1.tail())
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close"]
 
     df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
 
-    if isinstance(df1['Date'][0],datetime.datetime):
-        print("It's datetime")
-
     #df2 = df2.reset_index()
     #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    ax = df1.plot(x='Date', y='MA')
-    df1.plot(ax=ax, x='Date', y='MA')
-
-    ohlc = df1
+    ohlc = df1.tail(75)
+    #print(df1.tail())
     ohlc["Date"] = ohlc["Date"].map(mdates.date2num)
-    #print(ohlc.head())
 
     #ohlc = ohlc.reset_index()
     #print(ohlc.head()))
     #ohlc.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    if isinstance(ohlc['Date'][0],datetime.datetime):
-        print("It's datetime")
-    print(ohlc.head())
-
-    """
-    if isinstance(ohlc['Date'],str):
-        print("It's str")
-    else:
-        print("It's not")
-    """
-    print(ohlc.values)
+    # if isinstance(ohlc['Date'][0],datetime.datetime):
+    #     print("It's datetime")
+    # print(ohlc.head())
 
     f1, ax = plt.subplots(figsize=(8,5))
-    candlestick_ohlc(f1, ohlc.values, width=.6, colorup='b', colordown='r')
+    candlestick_ohlc(ax, zip(ohlc["Date"],
+                         ohlc['Open'], ohlc['High'],
+                         ohlc['Low'], ohlc['Close']), width=.6, colorup='b', colordown='r')
     #f1.xaxis_date()
     #f1.xaxis.set_major_formatter(mdates.DateFormatter('%y-%m-%d %H:%M:%S'))
 
@@ -142,6 +131,7 @@ def ma(df, n):
 
 def format_as_ohlc(df, timeframe):
     df['time'] = pd.to_datetime(df['time'],unit='ms')
+
     df = df.set_index(pd.DatetimeIndex(df['time']))
     data_ohlc =  df['price'].resample(timeframe).ohlc()
 
@@ -170,7 +160,6 @@ def macd(ohlc_data):
     fast_ma = 8
 
     macd_data = ti.macd(ohlc_data, fast_ma, slow_ma).tail(2)
-    print(macd_data)
     if macd_data.iloc[0,6] < 0 and macd_data.iloc[1,6] > 0:
         return "buy"
     elif macd_data.iloc[0,6] > 0 and macd_data.iloc[1,6] < 0:
@@ -178,40 +167,72 @@ def macd(ohlc_data):
     else:
         return "none"
 
-def compare_all():
+def compare_all(base_currency, test_type, download, days):
     all_symbols = get_currency_pairs()
     count = 0
-    buy_list = []
-    sell_list = []
+
     fileout = "Market.csv"
     outfile = open(fileout, 'w', newline='')
     crypto_writer = csv.writer(outfile, delimiter=',')
+    crypto_writer.writerow(['Pair','Signal', "Price"])
 
-    for symbol in all_symbols:
-        crypto_pair = "DAI" + symbol[0]
-        try:
-            crypto_df = update_history(7,25, 'DAI', symbol[0])
-        except:
+    if download is 0:
+        first = True
+        for symbol in all_symbols:
+            crypto_pair = base_currency + symbol[0]
+
+            if first:
+                try:
+                    base_df = load_data(base_currency, days)
+                    first = False
+                except:
+                    exit(1)
+
+            try:
+                quote_df = load_data(symbol, days)
+            except:
+                count = count + 1
+                continue
+
+            crypto_df = base_df[1] / quote_df[1]
+            ohlc_data = format_as_ohlc(crypto_df, '1D')
+            result = ma_crossover(ohlc_data)
+            result2 = macd(ohlc_data)
+            if result is "buy" or result is "sell":
+                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
+            if count is 10:
+                return
             count = count + 1
-            continue
+    else:
+        for symbol in all_symbols:
+            crypto_pair = base_currency + symbol[0]
+            try:
+                crypto_df = update_history(days,25, base_currency, symbol[0])
+            except:
+                count = count + 1
+                continue
 
-        ohlc_data = format_as_ohlc(crypto_df, '5Min')
-        result = ma_crossover(ohlc_data)
-        result2 = macd(ohlc_data)
-        if result is "buy" or result is "sell":
-            crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
-        if count is 10:
-            return
-        count = count + 1
-
-    for pair in buy_list:
-        print(pair + "\t buy")
-    for pair in sell_list:
-        print(pair + "\t sell")
+            ohlc_data = format_as_ohlc(crypto_df, '1D')
+            result = ma_crossover(ohlc_data)
+            result2 = macd(ohlc_data)
+            if result is "buy" or result is "sell":
+                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
+            if count is 10:
+                return
+            count = count + 1
 
     outfile.close()
 
-def save_data(filename, days):
+
+#Load csv files into pandas dataframe
+def load_data(currency, days):
+    try:
+        load_df = pd.read_csv(currency + str(days) + '.csv')
+    except ValueError:
+        print("Can't find this file")
+    return load_df
+
+def save_data(days):
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
 
@@ -220,24 +241,29 @@ def save_data(filename, days):
 
     saved_curr = []
     not_saved_curr = []
+
+    #List of filenames saved
+    list_files = []
     for curr in jdata:
         try:
             url_curr = url + curr
             jdata1 = requests.get(url_curr).json()
             df_curr = pd.DataFrame(jdata1['price'])
-            df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
+            df_curr.to_csv(curr + str(days) + '.csv', sep='\t')
             saved_curr.append(curr)
+            list_files = curr + str(days) + '.csv'
         except:
             not_saved_curr.append(curr)
 
     global saved
     saved = True
 
-    return saved_curr, not_saved_curr
+    return saved_curr, not_saved_curr, list_files
 
 if __name__ == '__main__':
-    df_rel = update_history(1, 20, "BTC", "DOGE")
-    ohlc_df = format_as_ohlc(df_rel, "5Min")
-    #ma_df = ma(ohlc_df, 10)
-    ma_plot(ohlc_df, df_rel)
-    #compare_all()
+    days = 90
+    test_type = int(sys.argv[1])
+    base_currency = sys.argv[2]
+    download = int(sys.argv[3])
+
+    compare_all(base_currency, test_type, download, days)
