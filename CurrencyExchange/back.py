@@ -105,9 +105,9 @@ def plot_save(df, curr_pair, days):
     plt.grid(True)
     ax.xaxis_date()
     ax.autoscale_view()
-    
+
     plt.savefig('./Charts/' + curr_pair + str(days) + '.png')
-    
+
 
 
 def ma(df, n):
@@ -215,7 +215,7 @@ def save_data(days):
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
 
-    base_url = "http://coincap.io/history"
+    base_url = "http://coincap.io/history/"
     url = base_url + str(days) + "day/"
 
     saved_curr = []
@@ -231,8 +231,10 @@ def save_data(days):
             df_curr.to_csv('./Data/' + curr + str(days) + '.csv', sep='\t')
             saved_curr.append(curr)
             list_files = curr + str(days) + '.csv'
+            print(curr)
         except:
             not_saved_curr.append(curr)
+            print(not_saved_curr)
 
     global saved
     saved = True
