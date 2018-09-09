@@ -6,6 +6,8 @@
 
 
 .mainWindow{
+  overflow: hidden;
+  position:fixed;
   height: 100%;
   width: 100%;
   transition: 0.6s;
@@ -13,6 +15,7 @@
 
 .dataContent{
   position:absolute;
+  overflow-y:scroll;
   height: 50%;
   width: 50%;
   background-color: rgba(193,156,8,0.3);
@@ -21,7 +24,7 @@
 
 
 .menuBar {
-  position: absolute;
+  position: fixed;
   height: 120%;
   width: 48px; 
   background-color: #6d7993; 
@@ -30,7 +33,7 @@
   bottom: 0;
   left: 0; 
   transition: 0.6s;
-  overflow-y: scroll;
+  overflow: hidden;
   padding-top: 0px;
 }
 
@@ -131,7 +134,9 @@ body{
 <body>
   <div id="main_w" class="mainWindow">
 
-    <div id="data_content" class="dataContent"></div>
+    <div id="grid" class="dataContent">
+      <div id="dummy" style="height:1000px"></div>
+    </div>
 
 
     <div id="menu_bar" class="menuBar">
@@ -245,7 +250,7 @@ body{
 
     function ShiftContent(val)
     {
-      var main_content_style = document.getElementById("data_content").style;
+      var main_content_style = document.getElementById("grid").style;
       if(val == 1)
       {
         main_content_style.marginLeft = "35%"
