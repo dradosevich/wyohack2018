@@ -167,36 +167,59 @@ def macd(ohlc_data):
     else:
         return "none"
 
-def compare_all():
+def compare_all(base_currency, test_type, download, days):
     all_symbols = get_currency_pairs()
     count = 0
-    buy_list = []
-    sell_list = []
+
     fileout = "Market.csv"
     outfile = open(fileout, 'w', newline='')
     crypto_writer = csv.writer(outfile, delimiter=',')
     crypto_writer.writerow(['Pair','Signal', "Price"])
-    for symbol in all_symbols:
-        crypto_pair = "DAI" + symbol[0]
-        try:
-            crypto_df = update_history(7,25, 'DAI', symbol[0])
-        except:
+
+    if download is 0:
+        first = True
+        for symbol in all_symbols:
+            crypto_pair = base_currency + symbol[0]
+
+            if first:
+                try:
+                    base_df = load_data(base_currency, days)
+                    first = False
+                except:
+                    exit(1)
+
+            try:
+                quote_df = load_data(symbol, days)
+            except:
+                count = count + 1
+                continue
+
+            crypto_df = base_df[1] / quote_df[1]
+            ohlc_data = format_as_ohlc(crypto_df, '1D')
+            result = ma_crossover(ohlc_data)
+            result2 = macd(ohlc_data)
+            if result is "buy" or result is "sell":
+                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
+            if count is 10:
+                return
             count = count + 1
-            continue
+    else:
+        for symbol in all_symbols:
+            crypto_pair = base_currency + symbol[0]
+            try:
+                crypto_df = update_history(days,25, base_currency, symbol[0])
+            except:
+                count = count + 1
+                continue
 
-        ohlc_data = format_as_ohlc(crypto_df, '1D')
-        result = ma_crossover(ohlc_data)
-        result2 = macd(ohlc_data)
-        if result is "buy" or result is "sell":
-            crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
-        if count is 10:
-            return
-        count = count + 1
-
-    for pair in buy_list:
-        print(pair + "\t buy")
-    for pair in sell_list:
-        print(pair + "\t sell")
+            ohlc_data = format_as_ohlc(crypto_df, '1D')
+            result = ma_crossover(ohlc_data)
+            result2 = macd(ohlc_data)
+            if result is "buy" or result is "sell":
+                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
+            if count is 10:
+                return
+            count = count + 1
 
     outfile.close()
 
@@ -206,7 +229,7 @@ def load_data(currency, days):
     try:
         load_df = pd.read_csv(currency + str(days) + '.csv')
     except ValueError:
-        print("Can't find this file")        
+        print("Can't find this file")
     return load_df
 
 def save_data(days):
@@ -218,7 +241,7 @@ def save_data(days):
 
     saved_curr = []
     not_saved_curr = []
-    
+
     #List of filenames saved
     list_files = []
     for curr in jdata:
@@ -238,4 +261,9 @@ def save_data(days):
     return saved_curr, not_saved_curr, list_files
 
 if __name__ == '__main__':
-    print('working')
+    days = 90
+    test_type = int(sys.argv[1])
+    base_currency = sys.argv[2]
+    download = int(sys.argv[3])
+
+    compare_all(base_currency, test_type, download, days)
