@@ -6,16 +6,11 @@
         "start": "electron ."
     },
     "devDependencies": {
-        "electron": "^2.0.5"
+        "electron": "^2.0.8"
     },
     "dependencies": {
-<<<<<<< HEAD
-        "jquery": "^3.3.1"
-    }
-}
-=======
+        "d3": "^5.7.0",
         "jquery": "^3.3.1",
         "shelljs": "^0.8.2"
     }
 }
->>>>>>> cc18ec4041f9acafc1a8a1b2e6cc5bcf3727d217

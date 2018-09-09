@@ -1,2 +1,2 @@
 # Ignore the huge node_modules directory for the repo
-./CurrencyExchange/GUI/node_modules
+**/node_modules/*
