@@ -41,14 +41,15 @@ def update_history(days, num_points, curr1, curr2):
     if dai_down is False:
         url1 = url + curr1
         jdata1 = requests.get(url1).json()
-        df1 = pd.DataFrame(jdata1['price'][-num_points:])
+        df1 = pd.DataFrame(jdata1['price'])#[-num_points:])
+        #print(df1.tail())
         global dai_df
         dai_df = df1
         dai_down = True
 
     url2 = url + curr2
     jdata2 = requests.get(url2).json()
-    df2 = pd.DataFrame(jdata2['price'][-num_points:])
+    df2 = pd.DataFrame(jdata2['price'])#[-num_points:])
 
     df1 = dai_df
 
@@ -85,43 +86,31 @@ def rel_plot(df):
 
 
 def ma_plot(df1, df2):
-
+    #print(df1.tail())
     df1 = df1.reset_index()
     df1.columns = ["Date","Open","High",'Low',"Close"]
 
     df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
 
-    if isinstance(df1['Date'][0],datetime.datetime):
-        print("It's datetime")
-
     #df2 = df2.reset_index()
     #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    ax = df1.plot(x='Date', y='MA')
-    df1.plot(ax=ax, x='Date', y='MA')
-
-    ohlc = df1
+    ohlc = df1.tail(75)
+    #print(df1.tail())
     ohlc["Date"] = ohlc["Date"].map(mdates.date2num)
-    #print(ohlc.head())
 
     #ohlc = ohlc.reset_index()
     #print(ohlc.head()))
     #ohlc.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    if isinstance(ohlc['Date'][0],datetime.datetime):
-        print("It's datetime")
-    print(ohlc.head())
-
-    """
-    if isinstance(ohlc['Date'],str):
-        print("It's str")
-    else:
-        print("It's not")
-    """
-    print(ohlc.values)
+    # if isinstance(ohlc['Date'][0],datetime.datetime):
+    #     print("It's datetime")
+    # print(ohlc.head())
 
     f1, ax = plt.subplots(figsize=(8,5))
-    candlestick_ohlc(f1, ohlc.values, width=.6, colorup='b', colordown='r')
+    candlestick_ohlc(ax, zip(ohlc["Date"],
+                         ohlc['Open'], ohlc['High'],
+                         ohlc['Low'], ohlc['Close']), width=.6, colorup='b', colordown='r')
     #f1.xaxis_date()
     #f1.xaxis.set_major_formatter(mdates.DateFormatter('%y-%m-%d %H:%M:%S'))
 
@@ -142,6 +131,7 @@ def ma(df, n):
 
 def format_as_ohlc(df, timeframe):
     df['time'] = pd.to_datetime(df['time'],unit='ms')
+
     df = df.set_index(pd.DatetimeIndex(df['time']))
     data_ohlc =  df['price'].resample(timeframe).ohlc()
 
@@ -195,7 +185,7 @@ def compare_all():
             count = count + 1
             continue
 
-        ohlc_data = format_as_ohlc(crypto_df, '5Min')
+        ohlc_data = format_as_ohlc(crypto_df, '1D')
         result = ma_crossover(ohlc_data)
         result2 = macd(ohlc_data)
         if result is "buy" or result is "sell":
@@ -236,8 +226,8 @@ def save_data(filename, days):
     return saved_curr, not_saved_curr
 
 if __name__ == '__main__':
-    df_rel = update_history(1, 20, "BTC", "DOGE")
-    ohlc_df = format_as_ohlc(df_rel, "5Min")
+    df_rel = update_history(90, 0, "DAI", "DOGE")
+    ohlc_df = format_as_ohlc(df_rel, "1D")
     #ma_df = ma(ohlc_df, 10)
     ma_plot(ohlc_df, df_rel)
     #compare_all()
