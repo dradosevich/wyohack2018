@@ -1,7 +1,7 @@
 # Ignore the GUI folder it is DEPRECATED
 
 
-node_modules zip file: https://www.dropbox.com/s/epgl3xbde2rixhg/node_modules.zip?dl=0
+## node_modules zip file: https://www.dropbox.com/s/epgl3xbde2rixhg/node_modules.zip?dl=0
 
 
 ### How To Run It From Repo
