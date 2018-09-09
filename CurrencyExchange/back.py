@@ -205,7 +205,13 @@ def compare_all(base_currency, test_type, download):
 
     outfile.close()
 
-def save_data(filename, days):
+
+#Load csv files into pandas dataframe
+def load_data(filename):
+    load_df = pd.read_csv(filename)
+    return load_df
+
+def save_data(days):
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
 
@@ -214,20 +220,24 @@ def save_data(filename, days):
 
     saved_curr = []
     not_saved_curr = []
+    
+    #List of filenames saved
+    list_files = []
     for curr in jdata:
         try:
             url_curr = url + curr
             jdata1 = requests.get(url_curr).json()
             df_curr = pd.DataFrame(jdata1['price'])
-            df_curr.to_csv(filename + '_' + curr + str(days) + '.csv', sep='\t')
+            df_curr.to_csv(curr + str(days) + '.csv', sep='\t')
             saved_curr.append(curr)
+            list_files = curr + str(days) + '.csv'
         except:
             not_saved_curr.append(curr)
 
     global saved
     saved = True
 
-    return saved_curr, not_saved_curr
+    return saved_curr, not_saved_curr, list_files
 
 if __name__ == '__main__':
     test_type = int(sys.argv[1])
