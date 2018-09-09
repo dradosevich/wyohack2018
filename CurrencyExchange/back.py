@@ -103,6 +103,9 @@ def plot_save(df, curr_pair, days):
                          ohlc['Open'], ohlc['High'],
                          ohlc['Low'], ohlc['Close']), width=.6, colorup='b', colordown='r')
 
+    plt.xlabel('Dates')
+    plt.ylabel('Values')
+    plt.legend(['Candlestick Plot ' + curr_pair])
     plt.grid(True)
     ax.xaxis_date()
     ax.autoscale_view()
@@ -217,7 +220,9 @@ def compare_all(base_currency, test_type, download, days):
 #Load csv files into pandas dataframe
 def load_data(currency, days):
     try:
-        load_df = pd.read_csv('Data\\' + currency + str(days) + '.csv', sep='\t', index_col= 0)
+        file_path = os.path.join("Data", currency)
+        file_path = file_path + str(days) + '.csv'
+        load_df = pd.read_csv(file_path, sep='\t', index_col= 0)
     except ValueError:
         print("Can't find this file")
     return load_df
