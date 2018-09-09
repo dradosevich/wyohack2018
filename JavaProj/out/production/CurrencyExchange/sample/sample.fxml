@@ -4,11 +4,13 @@
 <?import com.jfoenix.controls.JFXSpinner?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
+<?import java.awt.Image?>
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <columnConstraints>
       <ColumnConstraints />
@@ -30,6 +32,7 @@
             <Pane layoutX="352.0" layoutY="91.0" prefHeight="389.0" prefWidth="500.0" style="-fx-background-color: lightgreen;">
                <children>
                   <JFXSpinner layoutX="415.0" layoutY="308.0" />
+                  <ImageView id="image_view" layoutX="415.0" layoutY="390.0" fx:id="image_view" fitHeight="389.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Pane>
          </children>

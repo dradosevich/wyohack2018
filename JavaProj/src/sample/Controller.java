@@ -1,37 +1,26 @@
 package sample;
 
-import com.jfoenix.controls.JFXButton;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 public class Controller {
-
-    private  ObservableList<TableRow> data = FXCollections.observableArrayList();
-    public String[] textLines = new String[150];
-
-    //public TableRow[] Tab = new TableRow[150];
-
-
-    @FXML
-    private JFXButton refresh_button;
+    private Stage stage;
+    private Scene scene;
+    private Group group;
 
     @FXML
     private TableView<TableRow> t_view;
@@ -48,19 +37,30 @@ public class Controller {
     @FXML
     private ImageView image_view;
 
-    public void getData(){
+
+    void setStage(Stage s) {
+        stage = s;
+    }
+
+    void setScene(Scene s) {
+        scene = s;
+    }
+
+    void setGroup(Group g) {
+        group = g;
+    }
+
+    private void getData(){
         String[] token_values;
         String current_line;
-        int i = 0;
         File file = new File("Market.csv");
 
         try{
-            Scanner inStream = new Scanner(file, "UTF-8");
+            Scanner inStream = new Scanner(file, StandardCharsets.UTF_8);
             inStream.useDelimiter("\n");
             if(inStream.hasNextLine())
-                current_line = inStream.nextLine();
+                inStream.nextLine();
             while(inStream.hasNextLine()){
-                //textLines[i] = current_line;
                 current_line = inStream.nextLine();
                 System.out.println(current_line);
                 token_values = current_line.split(",");
@@ -69,9 +69,8 @@ public class Controller {
                 Tab.setBuy(token_values[1]);
                 Tab.setVal(token_values[2]);
                 t_view.getItems().add(Tab);
-                i++;
             }
-        }catch(FileNotFoundException e){
+        } catch(IOException e) {
             e.printStackTrace();
         }
 
@@ -79,7 +78,7 @@ public class Controller {
     }
 
     @FXML
-    public void initialize() throws IOException {
+    public void initialize() {
     coin_col.setCellValueFactory(new PropertyValueFactory<>("Coin"));
     buy_col.setCellValueFactory(new PropertyValueFactory<>("Buy"));
     val_col.setCellValueFactory(new PropertyValueFactory<>("Val"));
@@ -89,7 +88,7 @@ public class Controller {
 
 
     @FXML
-    public void refresh(javafx.scene.input.MouseEvent mouseEvent) throws IOException {
+    public void refresh() throws IOException {
         t_view.getItems().clear();
        Runtime.getRuntime().exec("python .\\back.py 3 DAI 0");
 //       System.out.println("Waiting");
@@ -103,7 +102,7 @@ public class Controller {
     }
 
     @FXML
-    public void highlightRow(MouseEvent mouseEvent) throws IOException {
+    public void highlightRow() throws IOException {
         String name = t_view.getSelectionModel().getSelectedItem().getCoin();
         String current = new java.io.File( "." ).getCanonicalPath();
 
@@ -111,12 +110,19 @@ public class Controller {
         name = current + "\\Charts\\" + name + ".png";
         System.out.println(name);
 
-        Image img = new Image("file:" + name, 100, 100, false, false);
+        Image img = new Image(new FileInputStream(name));
 
-        image_view = new ImageView();
-        image_view.setImage(img);
+        image_view = new ImageView(img);
+        image_view.setX(377);
+        image_view.setY(116);
+        image_view.setFitHeight(339);
+        image_view.setFitWidth(450);
         image_view.setVisible(true);
+        image_view.setCache(true);
 
+        group.getChildren().add(image_view);
+        stage.setScene(scene);
+        stage.show();
     }
 }
 
