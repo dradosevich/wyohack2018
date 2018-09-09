@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXSpinner?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
@@ -30,6 +31,7 @@
             <Pane layoutX="352.0" layoutY="91.0" prefHeight="389.0" prefWidth="500.0" style="-fx-background-color: lightgreen;">
                <children>
                   <JFXSpinner layoutX="415.0" layoutY="308.0" />
+                  <ImageView fx:id="image_view" fitHeight="389.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Pane>
          </children>
