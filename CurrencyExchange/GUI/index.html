@@ -14,11 +14,12 @@
 }
 
 .dataContent{
-  position:absolute;
-  overflow-y:scroll;
-  height: 50%;
-  width: 50%;
-  background-color: rgba(193,156,8,0.3);
+  verflow-y:scroll;
+  position:center;
+  height: 100%;
+  margin-left:48px;
+  margin-right: 0px;
+  background-color: #596070;
   transition: 0.6s;
 }
 
@@ -113,6 +114,25 @@ input:focus{
   /*background-color: yellow;*/
 }
 
+.updateButton{
+  width: 90%;
+  height: 6%;
+  background-color: #96858f;
+  margin:auto ;
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 3px;
+  border-color: #6d7993;
+  transition: 0.6s;
+  text-align: center;
+}
+
+
+.spacer{
+  width: 90%;
+  height: 2%;
+}
+
 select{
   color:#6d7993;
   width: 90%; 
@@ -121,6 +141,7 @@ select{
   border-width: 3px; 
   border-color: #6d7993;
   outline-color: #c19c08;
+  transition: 0.6s;
 }
 
 
@@ -134,12 +155,9 @@ body{
 <body>
   <div id="main_w" class="mainWindow">
 
-    <div id="grid" class="dataContent">
-      <div id="dummy" style="height:1000px"></div>
-    </div>
-
 
     <div id="menu_bar" class="menuBar">
+
 
       <div id="settings_button" class="settingsButton"
                            onmouseenter="Highlighted(event,2,1)"
@@ -155,7 +173,12 @@ body{
 
     </div>
 
+    <div id="data_content" class="dataContent">
+      <!-- Area loaded in by Wyatt's python-->
+      <center id="grid">
 
+      </center>
+    </div>
 
     <div id="search_bar" class="searchBar">
 
@@ -169,11 +192,23 @@ body{
 
     <div id="settings_bar" class="settingsBar">
       <div id="settings_menu" class="settingMenu">
+
+
         <select id="stats">
           <option value="1" onclick="SetAnalysis(1)">Moving Average Crossover</option>
           <option value="2" onclick="SetAnalysis(2)">MAC-D</option>
-          <option value="3" onclick="SetAnalysis(3)">More To Come...</option>
+          <option value="3" onclick="SetAnalysis(3)">MAC & MAC-D</option>
         </select>
+
+
+        <div id="sapcer1" class="spacer"></div>
+
+        <div id="update_cache" class="updateButton" onclick="Refresh()"
+                                                    onmouseenter="Highlighted(event,3,1)"
+                                                    onmouseleave="Highlighted(event,3,0)">
+          <img src="Icons/refresh.png" style="width: 10%; height: 100%">
+        </div>
+
       </div>
     </div>
   </div>
@@ -186,6 +221,7 @@ body{
     var $ = jQuery = require('jquery');
     var d3 = require('d3');
 
+    var scan_data = "";
 
     button_states = {search_clicked: false,
                      settings_clicked: false}
@@ -196,37 +232,112 @@ body{
     analysis_types = {t1: false,
                       t2: false,
                       t3: false}
+  var itemID = 0; //helps keep track of elements
+  var elems = new Array();
+
+  function populate()
+  {
+    shell.config.execPath = '/usr/local/bin/node' 
+       if(shell.exec('python test.py').code == 0)
+       {
+          d3.csv("Market.csv").then(function(data) {
+            scan_data = data // access by index and property
+            console.log(scan_data)
+          });
+       }
+  }
+
+  function addToGrid(data)
+  {
+    //alert("adding");
+    //create the ID for the element to be accessed
+        var id = "data"+ itemID;
+        itemID++;
+        //add id to an array to keep track
+        elems.push(id);
+        caption = data;
+        //set up the figure for dispaly
+        var newFig = document.createElement("img");
+        var divFig = document.createElement("div");
+        var text = document.createTextNode(caption);
+        var br = document.createElement("br");
 
 
-    function Highlighted(event,type,x)
+        if(elemType=='tag')
+        {
+          newFig.src = './res/folder.png';
+        }
+        else if (elemType=='file')
+        {
+          newFig.src = './res/icon.png';
+        }
+
+        //Setting up the figure
+        //newFig.src = 'https://cdn.bulbagarden.net/upload/7/73/004Charmander.png';
+        //newFig.src = './res/icon.png';
+        newFig.height = '90%';
+        newFig.width = '90%';
+
+        // creating the text below the figure
+
+        //adding the picture to the display area
+        divFig.appendChild(newFig);
+        divFig.appendChild(br);
+        divFig.appendChild(text);
+        divFig.setAttribute("class","image");
+        divFig.style.padding = "5px 5px 5px 5px";
+        divFig.style.width = "90%";
+        divFig.id=id;
+        //text.setAttribute("align","bottom");
+        document.getElementById('grid').appendChild(divFig);
+  }
+  function clearGrid() //empties the grid and the elements in the array
+  {
+    for(var i=0; i <elems.length; i++)
     {
-  
-      var src_elem = event.target.id;
-
-      if(src_elem == "search_button" && button_states.search_clicked){return;}
-      else if(src_elem == "settings_button" && button_states.settings_clicked){return;}
-      
-      if(x == 1 && type == 1)
-      {
-        event.target.style.transition = "0.8s";
-        event.target.style.backgroundImage = "url('Icons/searchHighlighted.png')";
-      }
-      else if(x == 0 && type == 1)
-      {
-        event.target.style.transition = "0.4s";
-        event.target.style.backgroundImage = "url('Icons/search.png')";
-      }
-      else if(x == 1 && type == 2)
-      {
-        event.target.style.transition = "0.4s";
-        event.target.style.backgroundImage = "url('Icons/settingsHighlighted.png')";
-      }
-      else if(x == 0 && type == 2)
-      {
-        event.target.style.transition = "0.4s";
-        event.target.style.backgroundImage = "url('Icons/settings.png')";
-      }
+      var toRemove = document.getElementById(elems[i]);
+      toRemove.parentNode.removeChild(toRemove);
     }
+    elems = [];
+  }
+
+      function Highlighted(event,type,x)
+      {
+    
+        var src_elem = event.target.id;
+
+        if(src_elem == "search_button" && button_states.search_clicked){return;}
+        else if(src_elem == "settings_button" && button_states.settings_clicked){return;}
+        
+        if(x == 1 && type == 1)
+        {
+          event.target.style.transition = "0.8s";
+          event.target.style.backgroundImage = "url('Icons/searchHighlighted.png')";
+        }
+        else if(x == 0 && type == 1)
+        {
+          event.target.style.transition = "0.4s";
+          event.target.style.backgroundImage = "url('Icons/search.png')";
+        }
+        else if(x == 1 && type == 2)
+        {
+          event.target.style.transition = "0.4s";
+          event.target.style.backgroundImage = "url('Icons/settingsHighlighted.png')";
+        }
+        else if(x == 0 && type == 2)
+        {
+          event.target.style.transition = "0.4s";
+          event.target.style.backgroundImage = "url('Icons/settings.png')";
+        }
+        else if(x == 1 && type == 3)
+        {
+          event.target.style.backgroundColor = "red";
+        }
+        else if(x == 0 && type == 3)
+        {
+          event.target.style.backgroundColor = "#96858f";
+        }
+      }
   
 
     function rgbTorgba(rgb,a)
@@ -250,7 +361,7 @@ body{
 
     function ShiftContent(val)
     {
-      var main_content_style = document.getElementById("grid").style;
+      var main_content_style = document.getElementById("data_content").style;
       if(val == 1)
       {
         main_content_style.marginLeft = "35%"
@@ -296,18 +407,14 @@ body{
         
 
         // CALL PYTHON CODE HERE
-        shell.config.execPath = '/usr/local/bin/node' 
+       shell.config.execPath = '/usr/local/bin/node' 
        if(shell.exec('python test.py').code == 0)
        {
           d3.csv("Market.csv").then(function(data) {
-          console.log(data); 
+            scan_data = data // access by index and property
+            console.log(scan_data)
           });
        } 
-
-        // console.log("Searching....");
-        // shell.config.execPath = '/usr/local/bin/node'
-        // var str = shell.exec('python test.py').stdout
-        // console.log(str)
       }
     }
 
@@ -337,6 +444,7 @@ body{
       var settingsbar_style = document.getElementById("settings_bar").style;
       var searchbar_style = document.getElementById("search_bar").style;
       var selector_style = document.getElementById("stats").style;
+      var updatebutton_style = document.getElementById("update_cache").style;
 
       if(!sidebar_states.settings_active && !sidebar_states.search_active)
       {
@@ -345,6 +453,8 @@ body{
         ShiftContent(1);
         selector_style.borderColor = "#D5D5D5";
         selector_style.color = "#D5D5D5";
+        updatebutton_style.borderColor = "#D5D5D5";
+        updatebutton_style.backgroundColor = "#96858f";
         sidebar_states.settings_active = true;
       }
       else if(sidebar_states.settings_active && !sidebar_states.search_active)
@@ -354,6 +464,8 @@ body{
         ShiftContent(0);
         selector_style.borderColor = "#6d7993";
         selector_style.color = "#6d7993";
+        updatebutton_style.borderColor = "#6d7993";
+        updatebutton_style.backgroundColor = "#6d7993";
         sidebar_states.settings_active = false;
       }
       else if(!sidebar_states.settings_active && sidebar_states.search_active)
@@ -363,6 +475,8 @@ body{
         searchbar_style.width = "calc(100% - (35% + 48px))"
         selector_style.borderColor = "#D5D5D5";
         selector_style.color = "#D5D5D5";
+        updatebutton_style.borderColor = "#D5D5D5";
+        updatebutton_style.backgroundColor = "#96858f";
         sidebar_states.settings_active = true;
       }
       else if(sidebar_states.settings_active && sidebar_states.search_active)
@@ -372,6 +486,8 @@ body{
         searchbar_style.width = "calc(100% - 48px)"
         selector_style.borderColor = "#6d7993";
         selector_style.color = "#6d7993";
+        updatebutton_style.borderColor = "#6d7993";
+        updatebutton_style.backgroundColor = "#6d7993";
         sidebar_states.settings_active = false;
       }
     }
@@ -415,6 +531,12 @@ body{
       if(val == 1){analysis_types.t1 = true;}
       else if(val == 2){analysis_types.t2 = true;}
       else if(val == 3){analysis_types.t3 = true;}
+    }
+
+    function Refresh()
+    {
+      console.log("HIT")
+      // bring up dialog
     }
   
   </script>
