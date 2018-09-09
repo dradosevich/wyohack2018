@@ -1,0 +1,2 @@
+# Ignore the huge node_modules directory for the repo
+**/node_modules/*

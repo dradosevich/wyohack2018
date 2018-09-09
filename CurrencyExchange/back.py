@@ -85,43 +85,29 @@ def rel_plot(df):
     df.plot(x='time', y='price')
 
 
-def ma_plot(df1, df2):
-    #print(df1.tail())
-    df1 = df1.reset_index()
-    df1.columns = ["Date","Open","High",'Low',"Close"]
+def plot_save(df, curr_pair, days):
+    df = df.reset_index()
+    df.columns = ["Date","Open","High",'Low',"Close"]
 
-    df1["Date"] = df1["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
+    df["Date"] = df["Date"].map(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
 
-    #df2 = df2.reset_index()
-    #df2.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    ohlc = df1.tail(75)
+    ohlc = df.tail(75)
     #print(df1.tail())
     ohlc["Date"] = ohlc["Date"].map(mdates.date2num)
 
-    #ohlc = ohlc.reset_index()
-    #print(ohlc.head()))
-    #ohlc.columns = ["Date","Open","High",'Low',"Close", "MA"]
 
-    # if isinstance(ohlc['Date'][0],datetime.datetime):
-    #     print("It's datetime")
-    # print(ohlc.head())
-
-    f1, ax = plt.subplots(figsize=(8,5))
+    _, ax = plt.subplots(figsize=(8,5))
     candlestick_ohlc(ax, zip(ohlc["Date"],
                          ohlc['Open'], ohlc['High'],
                          ohlc['Low'], ohlc['Close']), width=.6, colorup='b', colordown='r')
-    #f1.xaxis_date()
-    #f1.xaxis.set_major_formatter(mdates.DateFormatter('%y-%m-%d %H:%M:%S'))
 
     plt.grid(True)
     ax.xaxis_date()
     ax.autoscale_view()
-    #plt.xticks(rotation=45)
-    #plt.ylabel('Stock Price')
-    #plt.xlabel('Date Hours:Minutes')
-    plt.show()
-
+    
+    plt.savefig('./Charts/' + curr_pair + str(days) + '.png')
+    
 
 
 def ma(df, n):
@@ -224,6 +210,7 @@ def load_data(currency, days):
         print("Can't find this file")
     return load_df
 
+
 def save_data(days):
     url = "http://coincap.io/coins"
     jdata = requests.get(url).json()
@@ -241,7 +228,7 @@ def save_data(days):
             url_curr = url + curr
             jdata1 = requests.get(url_curr).json()
             df_curr = pd.DataFrame(jdata1['price'])
-            df_curr.to_csv(curr + str(days) + '.csv', sep='\t')
+            df_curr.to_csv('./Data/' + curr + str(days) + '.csv', sep='\t')
             saved_curr.append(curr)
             list_files = curr + str(days) + '.csv'
         except:
