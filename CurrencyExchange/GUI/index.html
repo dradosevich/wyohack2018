@@ -166,7 +166,7 @@ body{
       <div id="settings_menu" class="settingMenu">
         <select id="stats">
           <option value="1" onclick="SetAnalysis(1)">Moving Average Crossover</option>
-          <option value="2" onclick="SetAnalysis(2)">Relative Strength Index</option>
+          <option value="2" onclick="SetAnalysis(2)">MAC-D</option>
           <option value="3" onclick="SetAnalysis(3)">More To Come...</option>
         </select>
       </div>
@@ -178,6 +178,9 @@ body{
   <script>
 
     var shell = require('shelljs');
+    var $ = jQuery = require('jquery');
+    var d3 = require('d3');
+
 
     button_states = {search_clicked: false,
                      settings_clicked: false}
@@ -285,8 +288,16 @@ body{
         button_states.search_clicked = false;
         sidebar_states.search_active = false;
 
+        
 
         // CALL PYTHON CODE HERE
+        shell.config.execPath = '/usr/local/bin/node' 
+       if(shell.exec('python test.py').code == 0)
+       {
+          d3.csv("Market.csv").then(function(data) {
+          console.log(data); 
+          });
+       } 
 
         // console.log("Searching....");
         // shell.config.execPath = '/usr/local/bin/node'
