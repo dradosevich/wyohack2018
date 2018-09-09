@@ -131,7 +131,7 @@ body{
 <body>
   <div id="main_w" class="mainWindow">
 
-    <div id="data_content" class="dataContent"></div>
+    <div id="grid" class="dataContent"></div>
 
 
     <div id="menu_bar" class="menuBar">
@@ -245,7 +245,7 @@ body{
 
     function ShiftContent(val)
     {
-      var main_content_style = document.getElementById("data_content").style;
+      var main_content_style = document.getElementById("grid").style;
       if(val == 1)
       {
         main_content_style.marginLeft = "35%"
