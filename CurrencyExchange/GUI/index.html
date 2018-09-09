@@ -178,6 +178,9 @@ body{
   <script>
 
     var shell = require('shelljs');
+    var $ = jQuery = require('jquery');
+    var d3 = require('d3');
+
 
     button_states = {search_clicked: false,
                      settings_clicked: false}
@@ -285,8 +288,16 @@ body{
         button_states.search_clicked = false;
         sidebar_states.search_active = false;
 
+        
 
         // CALL PYTHON CODE HERE
+        shell.config.execPath = '/usr/local/bin/node' 
+       if(shell.exec('python test.py').code == 0)
+       {
+          d3.csv("Market.csv").then(function(data) {
+          console.log(data); 
+          });
+       } 
 
         // console.log("Searching....");
         // shell.config.execPath = '/usr/local/bin/node'
