@@ -175,8 +175,8 @@ def compare_all():
     sell_list = []
     fileout = "Market.csv"
     outfile = open(fileout, 'w', newline='')
-    crypto_writer = csv.writer(outfile, delimiter=',')
-
+    crypto_writer = csv.writer(outfile, delimiter=',', fieldnames= ["Pair", "Signal", "Price"])
+    crypto_writer.writeheader()
     for symbol in all_symbols:
         crypto_pair = "DAI" + symbol[0]
         try:
@@ -226,8 +226,4 @@ def save_data(filename, days):
     return saved_curr, not_saved_curr
 
 if __name__ == '__main__':
-    df_rel = update_history(90, 0, "DAI", "DOGE")
-    ohlc_df = format_as_ohlc(df_rel, "1D")
-    #ma_df = ma(ohlc_df, 10)
-    ma_plot(ohlc_df, df_rel)
-    #compare_all()
+    compare_all()
