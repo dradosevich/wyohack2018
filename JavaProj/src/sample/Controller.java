@@ -69,6 +69,12 @@ public class Controller {
         System.out.println("#Children: " + group.getChildren().size());
     }
 
+    void refresh_lite() {
+        group.getChildren().remove(image_view);
+        group.getChildren().remove(bos);
+        t_view.getItems().clear();
+    }
+
     private void getData(){
         String[] token_values;
         String current_line;
@@ -118,7 +124,7 @@ public class Controller {
 
 
     @FXML
-    public void enter() throws IOException {
+    public void enter() throws IOException, InterruptedException {
         if(tag.getText().equals("")){
             return;
         }
