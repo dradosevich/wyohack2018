@@ -210,40 +210,47 @@
               document.getElementById("message").innerHTML = "No Scan Data Yet -- Search It Up!"
               document.getElementById("message").style.marginTop = "20%"
             }
-            else if(amountToShow === "max")
-            {
-              for(var i = 0; i < data.length; i++)
-              {
-                var cap = "";
-                cap = data[i]["Pair"]+ " " + data[i]["Signal"]+ " "+ data[i]["Price"];
-                if(data[i]["Signal"] === "buy")
-                {
-                  addToGrid(cap,1, data[i]["Pair"]);
-                }
-                else
-                {
-                  addToGrid(cap,2,data[i]["Pair"]);
-                }
-                
-              }
-            }
             else
             {
-              for(var i = 0; i < amountToShow; i++)
+              document.getElementById("message").innerHTML = ""
+              document.getElementById("message").style.marginTop = "5%"
+
+              if(amountToShow === "max")
               {
-                var cap = "";
-                cap = data[i]["Pair"]+ " " + data[i]["Signal"] + " "+ data[i]["Price"];
-                console.log(cap)
-                if(data[i]["Signal"] === "buy")
+                for(var i = 0; i < data.length; i++)
                 {
-                  addToGrid(cap, 1, data[i]["Pair"]);
+                  var cap = "";
+                  cap = data[i]["Pair"]+ " " + data[i]["Signal"]+ " "+ data[i]["Price"];
+                  if(data[i]["Signal"] === "buy")
+                  {
+                    addToGrid(cap,1, data[i]["Pair"]);
+                  }
+                  else
+                  {
+                    addToGrid(cap,2,data[i]["Pair"]);
+                  }
+                  
                 }
-                else
+              }
+              else
+              {
+                for(var i = 0; i < amountToShow; i++)
                 {
-                  addToGrid(cap, 2, data[i]["Pair"]);
+                  var cap = "";
+                  cap = data[i]["Pair"]+ " " + data[i]["Signal"] + " "+ data[i]["Price"];
+                  console.log(cap)
+                  if(data[i]["Signal"] === "buy")
+                  {
+                    addToGrid(cap, 1, data[i]["Pair"]);
+                  }
+                  else
+                  {
+                    addToGrid(cap, 2, data[i]["Pair"]);
+                  }
                 }
               }
             }
+            
 
           });
         }
@@ -448,6 +455,7 @@
         {
           settingsbar_style.width = "35%";
           menubar_style.marginLeft = "35%";
+          ShiftContent(1);
           searchbar_style.width = "calc(100% - (35% + 48px))"
           selector_style.borderColor = "#D5D5D5";
           selector_style.color = "#D5D5D5";
@@ -461,6 +469,7 @@
         {
           settingsbar_style.width = "0%";
           menubar_style.marginLeft = "0%";
+          ShiftContent(0);
           searchbar_style.width = "calc(100% - 48px)"
           selector_style.borderColor = "#6d7993";
           selector_style.color = "#6d7993";
@@ -584,7 +593,7 @@
   
           <div id="spacer1" class="spacer"></div>
   
-          <select id="quantity" onchange="populate()">
+          <select id="quantity" onchange="populate('python3 dummy.py')">
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="max">Max</option>
