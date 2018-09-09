@@ -14,17 +14,20 @@ import javafx.scene.image.ImageView;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Controller {
 
     private  ObservableList<TableRow> data = FXCollections.observableArrayList();
     public String[] textLines = new String[150];
 
-    public TableRow[] Tab = new TableRow[150];
+    //public TableRow[] Tab = new TableRow[150];
 
 
     @FXML
@@ -54,16 +57,18 @@ public class Controller {
         try{
             Scanner inStream = new Scanner(file, "UTF-8");
             inStream.useDelimiter("\n");
-            current_line = inStream.nextLine();
-            while(inStream.hasNextLine()){
-                textLines[i] = current_line;
+            if(inStream.hasNextLine())
                 current_line = inStream.nextLine();
+            while(inStream.hasNextLine()){
+                //textLines[i] = current_line;
+                current_line = inStream.nextLine();
+                System.out.println(current_line);
                 token_values = current_line.split(",");
-                Tab[i] = new TableRow();
-                Tab[i].setCoin(token_values[0]);
-                Tab[i].setBuy(token_values[1]);
-                Tab[i].setVal(token_values[2]);
-                t_view.getItems().add(Tab[i]);
+                TableRow Tab = new TableRow();
+                Tab.setCoin(token_values[0]);
+                Tab.setBuy(token_values[1]);
+                Tab.setVal(token_values[2]);
+                t_view.getItems().add(Tab);
                 i++;
             }
         }catch(FileNotFoundException e){
@@ -87,14 +92,30 @@ public class Controller {
     public void refresh(javafx.scene.input.MouseEvent mouseEvent) throws IOException {
         t_view.getItems().clear();
        Runtime.getRuntime().exec("python .\\back.py 3 DAI 0");
-       getData();
+//       System.out.println("Waiting");
+//        try {
+//            TimeUnit.SECONDS.sleep(45);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(("Done Waiting"));
+        getData();
     }
 
     @FXML
     public void highlightRow(MouseEvent mouseEvent) throws IOException {
         String name = t_view.getSelectionModel().getSelectedItem().getCoin();
-        name = "./Charts/" + name + ".png";
-        image_view.setImage(new Image(name));
+        String current = new java.io.File( "." ).getCanonicalPath();
+
+        System.out.println("Current dir:"+current);
+        name = current + "\\Charts\\" + name + ".png";
+        System.out.println(name);
+
+        Image img = new Image("file:" + name, 100, 100, false, false);
+
+        image_view = new ImageView();
+        image_view.setImage(img);
+        image_view.setVisible(true);
 
     }
 }

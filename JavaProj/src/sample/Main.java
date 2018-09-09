@@ -28,9 +28,9 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Currency Exchange");
         primaryStage.setScene(new Scene(root, 975, 950));
-        primaryStage.setMaxHeight(530);
+        primaryStage.setMaxHeight(1530);
         primaryStage.setMinHeight(530);
-        primaryStage.setMaxWidth(870);
+        primaryStage.setMaxWidth(170);
         primaryStage.setMinWidth(870);
         primaryStage.show();
     }
