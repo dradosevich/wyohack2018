@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+
+
+.mainWindow{
+  height: 100%;
+  width: 100%;
+  transition: 0.6s;
+}
+
+.dataContent{
+  position:absolute;
+  height: 50%;
+  width: 50%;
+  background-color: rgba(193,156,8,0.3);
+  transition: 0.6s;
+}
+
+
+.menuBar {
+  position: absolute;
+  height: 120%;
+  width: 48px; 
+  background-color: #6d7993; 
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0; 
+  transition: 0.6s;
+  overflow-y: scroll;
+  padding-top: 0px;
+}
+
+.searchBar{
+  position: absolute;
+  height: 120%;
+  width: 0%;
+  background-color: #96858f;
+  transition: 0.6s;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin-left: 0;
+  text-align: center;
+  padding-top: 15%
+}
+
+
+input:focus{
+  outline:none;
+}
+.searchInput input[type=text]{
+  width: 90%;
+  margin: auto;
+  font-size: 40px;
+  border-radius: 20px;
+  border-color: rgba(255,255,255,0);
+  background-color: rgba(255,255,255,0.4);
+  padding-left: 20px;
+}
+
+.searchButton{
+  background-image: url('Icons/search.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  height: 48px;
+  width: 48px;
+  cursor: pointer;
+  margin-top: 48px;
+  border: 1px solid rgba(213,213,213,0);
+}
+
+
+/*put within a container*/
+.settingsButton{
+  background-image: url('Icons/settings.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  height: 48px;
+  width: 48px;
+  cursor: pointer;
+  margin-top: 0px;
+  border: 1px solid rgba(213,213,213,0);
+}
+
+
+.settingsBar{
+  position: absolute;
+  height: 120%;
+  width: 0%;
+  background-color: #6d7993;
+  transition: 0.6s;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.settingMenu{
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  /*background-color: yellow;*/
+}
+
+select{
+  color:#6d7993;
+  width: 90%; 
+  font-size: 25px; 
+  background-color:#6d7993; 
+  border-width: 3px; 
+  border-color: #6d7993;
+  outline-color: #c19c08;
+}
+
+
+body{
+  margin: 0px;
+}
+
+</style>
+</head>
+
+<body>
+  <div id="main_w" class="mainWindow">
+
+    <div id="data_content" class="dataContent"></div>
+
+
+    <div id="menu_bar" class="menuBar">
+
+      <div id="settings_button" class="settingsButton"
+                           onmouseenter="Highlighted(event,2,1)"
+                           onmouseleave="Highlighted(event,2,0)"
+                           onclick="OnSettingsClick()">
+      </div>
+
+      <div id="search_button" class="searchButton"
+                           onmouseenter="Highlighted(event,1,1)"
+                           onmouseleave="Highlighted(event,1,0)"
+                           onclick="OnSearchClick()">
+      </div>
+
+    </div>
+
+
+
+    <div id="search_bar" class="searchBar">
+
+      <div id="search_input" class="searchInput">
+        <input type="text" placeholder="Enter Crypto..." onkeypress="Search(event)">
+      </div>
+
+    </div>
+
+
+
+    <div id="settings_bar" class="settingsBar">
+      <div id="settings_menu" class="settingMenu">
+        <select id="stats">
+          <option value="1" onclick="SetAnalysis(1)">Moving Average Crossover</option>
+          <option value="2" onclick="SetAnalysis(2)">Relative Strength Index</option>
+          <option value="3" onclick="SetAnalysis(3)">More To Come...</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+
+    var shell = require('shelljs');
+
+    button_states = {search_clicked: false,
+                     settings_clicked: false}
+
+    sidebar_states = {search_active: false,
+                      settings_active: false};
+
+    analysis_types = {t1: false,
+                      t2: false,
+                      t3: false}
+
+
+    function Highlighted(event,type,x)
+    {
+  
+      var src_elem = event.target.id;
+
+      if(src_elem == "search_button" && button_states.search_clicked){return;}
+      else if(src_elem == "settings_button" && button_states.settings_clicked){return;}
+      
+      if(x == 1 && type == 1)
+      {
+        event.target.style.transition = "0.8s";
+        event.target.style.backgroundImage = "url('Icons/searchHighlighted.png')";
+      }
+      else if(x == 0 && type == 1)
+      {
+        event.target.style.transition = "0.4s";
+        event.target.style.backgroundImage = "url('Icons/search.png')";
+      }
+      else if(x == 1 && type == 2)
+      {
+        event.target.style.transition = "0.4s";
+        event.target.style.backgroundImage = "url('Icons/settingsHighlighted.png')";
+      }
+      else if(x == 0 && type == 2)
+      {
+        event.target.style.transition = "0.4s";
+        event.target.style.backgroundImage = "url('Icons/settings.png')";
+      }
+    }
+  
+
+    function rgbTorgba(rgb,a)
+    {
+  
+      var start = rgb.indexOf("(")
+      var end = rgb.indexOf(")")
+      var vals = rgb.slice(start + 1,end)
+  
+      var rgba = "rgba(" + vals + ", " + a + ")"
+  
+      return rgba
+    }
+
+    function setMargin(style)
+    {
+      console.log("SET");
+      style.margin = "0%";
+      return;
+    }
+
+    function ShiftContent(val)
+    {
+      var main_content_style = document.getElementById("data_content").style;
+      if(val == 1)
+      {
+        main_content_style.marginLeft = "35%"
+      }
+      else if(val == 0)
+      {
+        main_content_style.marginLeft = "0%"
+      }
+    }
+
+
+    function OnSearchClick()
+    {
+
+      var search_button = document.getElementById("search_button");
+
+      if(!button_states.search_clicked)
+      {
+        search_button.style.backgroundImage = "url('Icons/searchSelected.png')";
+        button_states.search_clicked = true;
+      }
+      else
+      {
+        search_button.style.backgroundImage = "url('Icons/search.png')";
+        button_states.search_clicked = false;
+      }
+
+      ToggleSearchBar();
+    }
+
+    function Search(event)
+    {
+      //console.log(event.keyCode)
+      if(event.keyCode == 13)
+      {
+        var searchbar_style = document.getElementById("search_bar").style;
+        var search_button_style = document.getElementById("search_button").style;
+        searchbar_style.width = "0%";
+        search_button_style.backgroundImage = "url('Icons/search.png')";
+        button_states.search_clicked = false;
+        sidebar_states.search_active = false;
+
+
+        // CALL PYTHON CODE HERE
+
+        // console.log("Searching....");
+        // shell.config.execPath = '/usr/local/bin/node'
+        // var str = shell.exec('python test.py').stdout
+        // console.log(str)
+      }
+    }
+
+    function OnSettingsClick()
+    {
+
+      var settings_button = document.getElementById("settings_button");
+
+      if(!button_states.settings_clicked)
+      {
+        settings_button.style.backgroundImage = "url('Icons/settingsSelected.png')";
+        button_states.settings_clicked = true;
+      }
+      else
+      {
+        settings_button.style.backgroundImage = "url('Icons/settings.png')";
+        button_states.settings_clicked = false;
+      }
+
+      ToggleSettingsBar();
+    }
+
+
+    function ToggleSettingsBar()
+    {
+      var menubar_style = document.getElementById("menu_bar").style;
+      var settingsbar_style = document.getElementById("settings_bar").style;
+      var searchbar_style = document.getElementById("search_bar").style;
+      var selector_style = document.getElementById("stats").style;
+
+      if(!sidebar_states.settings_active && !sidebar_states.search_active)
+      {
+        settingsbar_style.width = "35%";
+        menubar_style.marginLeft = "35%";
+        ShiftContent(1);
+        selector_style.borderColor = "#D5D5D5";
+        selector_style.color = "#D5D5D5";
+        sidebar_states.settings_active = true;
+      }
+      else if(sidebar_states.settings_active && !sidebar_states.search_active)
+      {
+        settingsbar_style.width = "0";
+        menubar_style.marginLeft = "0";
+        ShiftContent(0);
+        selector_style.borderColor = "#6d7993";
+        selector_style.color = "#6d7993";
+        sidebar_states.settings_active = false;
+      }
+      else if(!sidebar_states.settings_active && sidebar_states.search_active)
+      {
+        settingsbar_style.width = "35%";
+        menubar_style.marginLeft = "35%";
+        searchbar_style.width = "calc(100% - (35% + 48px))"
+        selector_style.borderColor = "#D5D5D5";
+        selector_style.color = "#D5D5D5";
+        sidebar_states.settings_active = true;
+      }
+      else if(sidebar_states.settings_active && sidebar_states.search_active)
+      {
+        settingsbar_style.width = "0%";
+        menubar_style.marginLeft = "0%";
+        searchbar_style.width = "calc(100% - 48px)"
+        selector_style.borderColor = "#6d7993";
+        selector_style.color = "#6d7993";
+        sidebar_states.settings_active = false;
+      }
+    }
+
+
+    function ToggleSearchBar()
+    {
+      var searchbar = document.getElementById("search_bar");
+      var searchbar_style = searchbar.style;
+      var menu_bar_style = document.getElementById("menu_bar").style;
+
+
+      if(!sidebar_states.search_active && !sidebar_states.settings_active)
+      {
+        searchbar_style.width = "calc(100% - 48px)";
+        sidebar_states.search_active = true;
+      }
+      else if(sidebar_states.search_active && !sidebar_states.settings_active)
+      {
+        searchbar_style.width = "0%";
+        sidebar_states.search_active = false;
+      }
+      else if(!sidebar_states.search_active && sidebar_states.settings_active)
+      {
+        searchbar_style.width = "calc(100% - (35% + 48px))";
+        sidebar_states.search_active = true;
+      }
+      else if(sidebar_states.search_active && sidebar_states.settings_active)
+      {
+        searchbar_style.width = "0%";
+        sidebar_states.search_active = false;
+      }
+      else
+      {
+        console.Log("Why are we here?");
+      }
+    }
+
+    function SetAnalysis(val)
+    {
+      if(val == 1){analysis_types.t1 = true;}
+      else if(val == 2){analysis_types.t2 = true;}
+      else if(val == 3){analysis_types.t3 = true;}
+    }
+  
+  </script>
+
+</body>
+</html>
