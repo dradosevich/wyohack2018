@@ -97,7 +97,7 @@ def plot_save(df, curr_pair, days):
     ohlc["Date"] = ohlc["Date"].map(mdates.date2num)
 
 
-    _, ax = plt.subplots(figsize=(8,5))
+    fig, ax = plt.subplots(figsize=(8,5))
     candlestick_ohlc(ax, zip(ohlc["Date"],
                          ohlc['Open'], ohlc['High'],
                          ohlc['Low'], ohlc['Close']), width=.6, colorup='b', colordown='r')
@@ -107,6 +107,7 @@ def plot_save(df, curr_pair, days):
     ax.autoscale_view()
 
     plt.savefig('./Charts/' + curr_pair + str(days) + '.png')
+    plt.close()
 
 
 
@@ -169,19 +170,21 @@ def compare_all(base_currency, test_type, download, days):
     quote_df = []
     try:
         base_df = load_data(base_currency, days)
-        first = False
+        base_df.columns = ['time', 'price']
     except:
+        print("could not load base currency")
         exit(1)
 
     for symbol in all_symbols:
         crypto_pair = base_currency + symbol[0]
         try:
-            quote_df = load_data(symbol, days)
+            quote_df = load_data(symbol[0], days)
+            quote_df.columns = ['time', 'price']
         except:
-            count = count + 1
             continue
 
-        crypto_df = base_df[1] / quote_df[1]
+        crypto_df = base_df.copy()
+        crypto_df['price'] = base_df['price'] / quote_df['price']
         ohlc_data = format_as_ohlc(crypto_df, '1D')
 
         if test_type is 1:
@@ -197,15 +200,19 @@ def compare_all(base_currency, test_type, download, days):
 
         if result is 1:
             crypto_writer.writerow([crypto_pair, "buy", ohlc_data.tail(1).iloc[0,3]])
+            plot_save(ohlc_data, crypto_pair, days)
         elif result is -1:
             crypto_writer.writerow([crypto_pair, "sell", ohlc_data.tail(1).iloc[0,3]])
+            plot_save(ohlc_data, crypto_pair, days)
+
+
 
     outfile.close()
 
 #Load csv files into pandas dataframe
 def load_data(currency, days):
     try:
-        load_df = pd.read_csv(currency + str(days) + '.csv')
+        load_df = pd.read_csv('Data\\' + currency + str(days) + '.csv', sep='\t', index_col= 0)
     except ValueError:
         print("Can't find this file")
     return load_df
