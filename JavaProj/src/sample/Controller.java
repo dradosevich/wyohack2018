@@ -59,6 +59,16 @@ public class Controller {
         group = g;
     }
 
+    void refresh() {
+        System.out.println("#Children: " + group.getChildren().size());
+        group.getChildren().remove(image_view);
+        group.getChildren().remove(bos);
+        tag.setText("");
+        indics.getSelectionModel().select(2);
+        t_view.getItems().clear();
+        System.out.println("#Children: " + group.getChildren().size());
+    }
+
     private void getData(){
         String[] token_values;
         String current_line;
@@ -109,6 +119,9 @@ public class Controller {
 
     @FXML
     public void enter() throws IOException {
+        if(tag.getText().equals("")){
+            return;
+        }
         t_view.getItems().removeAll();
         t_view.getItems().clear();
         t_view.refresh();
@@ -155,6 +168,7 @@ public class Controller {
     @FXML
     public void highlightRow() throws IOException {
         if(t_view.getSelectionModel().getSelectedItem() == null) {return; }
+
         String bs = t_view.getSelectionModel().getSelectedItem().getBuy();
         group.getChildren().remove(bos);
         bos.setAlignment(CENTER);
@@ -176,6 +190,7 @@ public class Controller {
 
         Image img = new Image(new FileInputStream(name));
 
+        group.getChildren().remove(image_view);
         image_view = new ImageView(img);
         image_view.setX(377);
         image_view.setY(116);
