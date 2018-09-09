@@ -27,12 +27,12 @@
 .menuBar {
   position: fixed;
   height: 120%;
-  width: 48px; 
-  background-color: #6d7993; 
+  width: 48px;
+  background-color: #6d7993;
   top: 0;
   right: 0;
   bottom: 0;
-  left: 0; 
+  left: 0;
   transition: 0.6s;
   overflow: hidden;
   padding-top: 0px;
@@ -135,10 +135,10 @@ input:focus{
 
 select{
   color:#6d7993;
-  width: 90%; 
-  font-size: 25px; 
-  background-color:#6d7993; 
-  border-width: 3px; 
+  width: 90%;
+  font-size: 25px;
+  background-color:#6d7993;
+  border-width: 3px;
   border-color: #6d7993;
   outline-color: #c19c08;
   transition: 0.6s;
@@ -220,7 +220,7 @@ body{
     var shell = require('shelljs');
     var $ = jQuery = require('jquery');
     var d3 = require('d3');
-
+    var amountToShow = 0;
     var scan_data = "";
 
     button_states = {search_clicked: false,
@@ -237,13 +237,22 @@ body{
 
   function populate()
   {
-    shell.config.execPath = '/usr/local/bin/node' 
+    shell.config.execPath = '/usr/local/bin/node'
        if(shell.exec('python test.py').code == 0)
        {
           d3.csv("Market.csv").then(function(data) {
             scan_data = data // access by index and property
             console.log(scan_data)
           });
+       }
+       if(scan_data!== "")
+       {
+         for(var i =0; i <amountToShow; i++)
+         {
+           var cap = "";
+           cap = scan_data[i][pair]+ " " +scan_data[i][signal]+" "+ scan_data[0][price];
+           addToGrid(cap);
+         }
        }
   }
 
@@ -303,12 +312,12 @@ body{
 
       function Highlighted(event,type,x)
       {
-    
+
         var src_elem = event.target.id;
 
         if(src_elem == "search_button" && button_states.search_clicked){return;}
         else if(src_elem == "settings_button" && button_states.settings_clicked){return;}
-        
+
         if(x == 1 && type == 1)
         {
           event.target.style.transition = "0.8s";
@@ -338,17 +347,17 @@ body{
           event.target.style.backgroundColor = "#96858f";
         }
       }
-  
+
 
     function rgbTorgba(rgb,a)
     {
-  
+
       var start = rgb.indexOf("(")
       var end = rgb.indexOf(")")
       var vals = rgb.slice(start + 1,end)
-  
+
       var rgba = "rgba(" + vals + ", " + a + ")"
-  
+
       return rgba
     }
 
@@ -404,17 +413,17 @@ body{
         button_states.search_clicked = false;
         sidebar_states.search_active = false;
 
-        
+
 
         // CALL PYTHON CODE HERE
-       shell.config.execPath = '/usr/local/bin/node' 
+       shell.config.execPath = '/usr/local/bin/node'
        if(shell.exec('python test.py').code == 0)
        {
           d3.csv("Market.csv").then(function(data) {
             scan_data = data // access by index and property
             console.log(scan_data)
           });
-       } 
+       }
       }
     }
 
@@ -538,7 +547,7 @@ body{
       console.log("HIT")
       // bring up dialog
     }
-  
+
   </script>
 
 </body>
