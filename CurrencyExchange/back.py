@@ -12,6 +12,7 @@ import matplotlib.dates as mdates
 from mpl_finance import candlestick_ohlc
 import technical_indicators as ti
 import csv
+import sys
 import datetime
 
 
@@ -31,7 +32,6 @@ def update_front(url):
     return df
 
 
-#Update historical data
 def update_history(days, num_points, curr1, curr2):
     base_url = "http://coincap.io/history/"
     url = base_url + str(days) + "day/"
@@ -148,11 +148,11 @@ def ma_crossover(ohlc_data):
     slow_ma = ma(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
     fast_ma = ma(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
-        return "buy"
+        return 1
     elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
-        return "sell"
+        return -1
     else:
-        return "none"
+        return 0
 
 
 def macd(ohlc_data):
@@ -161,68 +161,60 @@ def macd(ohlc_data):
 
     macd_data = ti.macd(ohlc_data, fast_ma, slow_ma).tail(2)
     if macd_data.iloc[0,6] < 0 and macd_data.iloc[1,6] > 0:
-        return "buy"
+        return 1
     elif macd_data.iloc[0,6] > 0 and macd_data.iloc[1,6] < 0:
-        return "sell"
+        return -1
     else:
-        return "none"
+        return 0
 
 def compare_all(base_currency, test_type, download, days):
     all_symbols = get_currency_pairs()
-    count = 0
 
     fileout = "Market.csv"
     outfile = open(fileout, 'w', newline='')
     crypto_writer = csv.writer(outfile, delimiter=',')
     crypto_writer.writerow(['Pair','Signal', "Price"])
 
-    if download is 0:
-        first = True
-        for symbol in all_symbols:
-            crypto_pair = base_currency + symbol[0]
+    if download is 1:
+        save_data(days)
 
-            if first:
-                try:
-                    base_df = load_data(base_currency, days)
-                    first = False
-                except:
-                    exit(1)
+    first = True
+    base_df = []
+    quote_df = []
+    try:
+        base_df = load_data(base_currency, days)
+        first = False
+    except:
+        exit(1)
 
-            try:
-                quote_df = load_data(symbol, days)
-            except:
-                count = count + 1
-                continue
-
-            crypto_df = base_df[1] / quote_df[1]
-            ohlc_data = format_as_ohlc(crypto_df, '1D')
-            result = ma_crossover(ohlc_data)
-            result2 = macd(ohlc_data)
-            if result is "buy" or result is "sell":
-                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
-            if count is 10:
-                return
+    for symbol in all_symbols:
+        crypto_pair = base_currency + symbol[0]
+        try:
+            quote_df = load_data(symbol, days)
+        except:
             count = count + 1
-    else:
-        for symbol in all_symbols:
-            crypto_pair = base_currency + symbol[0]
-            try:
-                crypto_df = update_history(days,25, base_currency, symbol[0])
-            except:
-                count = count + 1
-                continue
+            continue
 
-            ohlc_data = format_as_ohlc(crypto_df, '1D')
+        crypto_df = base_df[1] / quote_df[1]
+        ohlc_data = format_as_ohlc(crypto_df, '1D')
+
+        if test_type is 1:
             result = ma_crossover(ohlc_data)
-            result2 = macd(ohlc_data)
-            if result is "buy" or result is "sell":
-                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
-            if count is 10:
-                return
-            count = count + 1
+        elif test_type is 2:
+            result = macd_data(ohlc_data)
+        else:
+            result = ma_crossover(ohlc_data) + macd_data(ohlc_data)
+            if result is -2:
+                result = -1
+            elif result is 2:
+                result = 1
+
+        if result is 1:
+            crypto_writer.writerow([crypto_pair, "buy", ohlc_data.tail(1).iloc[0,3]])
+        elif result is -1:
+            crypto_writer.writerow([crypto_pair, "sell", ohlc_data.tail(1).iloc[0,3]])
 
     outfile.close()
-
 
 #Load csv files into pandas dataframe
 def load_data(currency, days):
