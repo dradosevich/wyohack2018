@@ -169,7 +169,6 @@ def compare_all(base_currency, test_type, download, days):
     if download is 1:
         save_data(days)
 
-    first = True
     base_df = []
     quote_df = []
     try:
