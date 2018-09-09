@@ -167,7 +167,7 @@ def macd(ohlc_data):
     else:
         return "none"
 
-def compare_all(base_currency, test_type, download):
+def compare_all(base_currency, test_type, download, days):
     all_symbols = get_currency_pairs()
     count = 0
 
@@ -177,19 +177,37 @@ def compare_all(base_currency, test_type, download):
     crypto_writer.writerow(['Pair','Signal', "Price"])
 
     if download is 0:
+        first = True
         for symbol in all_symbols:
+            crypto_pair = base_currency + symbol[0]
+
+            if first:
+                try:
+                    base_df = load_data(base_currency, days)
+                    first = False
+                except:
+                    exit(1)
+
             try:
-                if first:
-                    
-                relative_value = df1[1] / df2[1]
+                quote_df = load_data(symbol, days)
             except:
                 count = count + 1
                 continue
+
+            crypto_df = base_df[1] / quote_df[1]
+            ohlc_data = format_as_ohlc(crypto_df, '1D')
+            result = ma_crossover(ohlc_data)
+            result2 = macd(ohlc_data)
+            if result is "buy" or result is "sell":
+                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
+            if count is 10:
+                return
+            count = count + 1
     else:
         for symbol in all_symbols:
             crypto_pair = base_currency + symbol[0]
             try:
-                crypto_df = update_history(7,25, base_currency, symbol[0])
+                crypto_df = update_history(days,25, base_currency, symbol[0])
             except:
                 count = count + 1
                 continue
@@ -220,7 +238,7 @@ def save_data(days):
 
     saved_curr = []
     not_saved_curr = []
-    
+
     #List of filenames saved
     list_files = []
     for curr in jdata:
@@ -240,8 +258,9 @@ def save_data(days):
     return saved_curr, not_saved_curr, list_files
 
 if __name__ == '__main__':
+    days = 90
     test_type = int(sys.argv[1])
     base_currency = sys.argv[2]
     download = int(sys.argv[3])
 
-    compare_all(base_currency, test_type, download)
+    compare_all(base_currency, test_type, download, days)
