@@ -136,8 +136,8 @@ def ma_crossover(ohlc_data):
     slow_lookback = 20
     fast_lookback = 10
 
-    slow_ma = ma(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
-    fast_ma = ma(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
+    slow_ma = ti.moving_average(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
+    fast_ma = ti.moving_average(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
         return "buy"
     elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
