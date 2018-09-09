@@ -202,8 +202,11 @@ def compare_all():
 
 
 #Load csv files into pandas dataframe
-def load_data(filename):
-    load_df = pd.read_csv(filename)
+def load_data(currency, days):
+    try:
+        load_df = pd.read_csv(currency + str(days) + '.csv')
+    except ValueError:
+        print("Can't find this file")        
     return load_df
 
 def save_data(days):
@@ -235,4 +238,4 @@ def save_data(days):
     return saved_curr, not_saved_curr, list_files
 
 if __name__ == '__main__':
-    compare_all()
+    print('working')
