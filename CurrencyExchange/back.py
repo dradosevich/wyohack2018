@@ -136,11 +136,11 @@ def ma_crossover(ohlc_data):
     slow_ma = ma(ohlc_data.tail(slow_lookback + 2), 20).tail(2)
     fast_ma = ma(ohlc_data.tail(fast_lookback + 2), 10).tail(2)
     if fast_ma.iloc[0,4] < slow_ma.iloc[0,4] and fast_ma.iloc[1,4] > slow_ma.iloc[1,4]:
-        return 1
+        return "buy"
     elif fast_ma.iloc[0,4] > slow_ma.iloc[0,4] and fast_ma.iloc[1,4] < slow_ma.iloc[1,4]:
-        return -1
+        return "sell"
     else:
-        return 0
+        return "none"
 
 
 def macd(ohlc_data):
@@ -149,11 +149,11 @@ def macd(ohlc_data):
 
     macd_data = ti.macd(ohlc_data, fast_ma, slow_ma).tail(2)
     if macd_data.iloc[0,6] < 0 and macd_data.iloc[1,6] > 0:
-        return 1
+        return "buy"
     elif macd_data.iloc[0,6] > 0 and macd_data.iloc[1,6] < 0:
-        return -1
+        return "sell"
     else:
-        return 0
+        return "none"
 
 def compare_all(base_currency, test_type, download, days):
     all_symbols = get_currency_pairs()
@@ -193,16 +193,20 @@ def compare_all(base_currency, test_type, download, days):
         elif test_type is 2:
             result = macd(ohlc_data)
         else:
-            result = ma_crossover(ohlc_data) + macd(ohlc_data)
-            if result is -2:
-                result = -1
-            elif result is 2:
-                result = 1
+            r1 = ma_crossover(ohlc_data)
+            if r1 is "none":
+                continue
+            else:
+                r2 = macd(ohlc_data)
+                if r1 is r2:
+                    result = r1
+                else:
+                    result = "none"
 
-        if result is 1:
+        if result is "buy":
             crypto_writer.writerow([crypto_pair, "buy", ohlc_data.tail(1).iloc[0,3]])
             plot_save(ohlc_data, crypto_pair, days)
-        elif result is -1:
+        elif result is "sell":
             crypto_writer.writerow([crypto_pair, "sell", ohlc_data.tail(1).iloc[0,3]])
             plot_save(ohlc_data, crypto_pair, days)
 
