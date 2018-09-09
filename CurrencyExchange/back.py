@@ -167,36 +167,41 @@ def macd(ohlc_data):
     else:
         return "none"
 
-def compare_all():
+def compare_all(base_currency, test_type, download):
     all_symbols = get_currency_pairs()
     count = 0
-    buy_list = []
-    sell_list = []
+
     fileout = "Market.csv"
     outfile = open(fileout, 'w', newline='')
     crypto_writer = csv.writer(outfile, delimiter=',')
     crypto_writer.writerow(['Pair','Signal', "Price"])
-    for symbol in all_symbols:
-        crypto_pair = "DAI" + symbol[0]
-        try:
-            crypto_df = update_history(7,25, 'DAI', symbol[0])
-        except:
+
+    if download is 0:
+        for symbol in all_symbols:
+            try:
+                if first:
+                    
+                relative_value = df1[1] / df2[1]
+            except:
+                count = count + 1
+                continue
+    else:
+        for symbol in all_symbols:
+            crypto_pair = base_currency + symbol[0]
+            try:
+                crypto_df = update_history(7,25, base_currency, symbol[0])
+            except:
+                count = count + 1
+                continue
+
+            ohlc_data = format_as_ohlc(crypto_df, '1D')
+            result = ma_crossover(ohlc_data)
+            result2 = macd(ohlc_data)
+            if result is "buy" or result is "sell":
+                crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
+            if count is 10:
+                return
             count = count + 1
-            continue
-
-        ohlc_data = format_as_ohlc(crypto_df, '1D')
-        result = ma_crossover(ohlc_data)
-        result2 = macd(ohlc_data)
-        if result is "buy" or result is "sell":
-            crypto_writer.writerow([crypto_pair, result, ohlc_data.tail(1).iloc[0,3]])
-        if count is 10:
-            return
-        count = count + 1
-
-    for pair in buy_list:
-        print(pair + "\t buy")
-    for pair in sell_list:
-        print(pair + "\t sell")
 
     outfile.close()
 
@@ -225,4 +230,8 @@ def save_data(filename, days):
     return saved_curr, not_saved_curr
 
 if __name__ == '__main__':
-    compare_all()
+    test_type = int(sys.argv[1])
+    base_currency = sys.argv[2]
+    download = int(sys.argv[3])
+
+    compare_all(base_currency, test_type, download)
