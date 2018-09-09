@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -23,6 +24,7 @@ import java.util.Scanner;
 public class Controller {
     public JFXTextField tag;
     public JFXSpinner spinner;
+    public ComboBox indics;
     private Stage stage;
     private Scene scene;
     private Group group;
@@ -41,6 +43,9 @@ public class Controller {
 
     @FXML
     private ImageView image_view;
+
+    //@FXML
+    //private ComboBox<String> indics;
 
     void setStage(Stage s) {
         stage = s;
@@ -80,14 +85,37 @@ public class Controller {
 
     }
 
+    void initializeCB() {
+        //indics = new ComboBox<>();
+        //indics.getItems().clear();
+        for(int i = 1; i <= 10; i++) {
+            indics.getItems().add(Integer.toString(i));
+        }
+        System.out.println("items: " + indics.getItems().toString());
+        indics.getSelectionModel().select(2);
+        group.getChildren().add(indics);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+
     @FXML
     public void initialize() {
         tag.setPadding(new Insets(7));
+//        indics = new ComboBox<>();
+//        for(int i = 1; i <= 10; i++) {
+//            indics.getItems().add(Integer.toString(i));
+//        }
+//        System.out.println("items: " + indics.getItems().toString());
+//        indics.getSelectionModel().select(3);
+//        HBox hbox = new HBox(indics);
+
+
+
         coin_col.setCellValueFactory(new PropertyValueFactory<>("Coin"));
         buy_col.setCellValueFactory(new PropertyValueFactory<>("Buy"));
         val_col.setCellValueFactory(new PropertyValueFactory<>("Val"));
         spinner.setVisible(false);
-        //getData();
     }
 
 
@@ -96,22 +124,27 @@ public class Controller {
         t_view.getItems().removeAll();
         t_view.getItems().clear();
         t_view.refresh();
-        if(group.getChildren().size() > 1)
-          group.getChildren().remove(1,group.getChildren().size()-1);
+        System.out.println("#Children: " + group.getChildren().size());
+        if(group.getChildren().size() > 2) {
+            group.getChildren().remove(1, group.getChildren().size() - 1);
+            //group.getChildren().add(indics);
+            stage.setScene(scene);
+            stage.show();
+        }
 
-        String command = "python .\\back.py 3 " + tag.getText() + " 0";
+        String command = "python .\\back.py " + indics.getSelectionModel().getSelectedItem().toString() + " " + tag.getText() + " 0";
         System.out.println("Command: " + command);
 
-        spinner.setVisible(true);
         System.out.print("Calling Process...");
         Process proc = Runtime.getRuntime().exec(command);
+        spinner.setVisible(true);
         try {
             proc.waitFor();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Done!");
         spinner.setVisible(false);
+        System.out.println("Done!");
 
         getData();
     }

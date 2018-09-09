@@ -29,6 +29,7 @@ public class Main extends Application {
         controller.setStage(primaryStage);
         controller.setGroup(group);
         controller.setScene(scene);
+        controller.initializeCB();
     }
 
 

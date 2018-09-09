@@ -13,6 +13,8 @@
 <?import java.awt.Image?>
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.ComboBox?>
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <columnConstraints>
       <ColumnConstraints />
@@ -23,7 +25,8 @@
    <children>
       <Pane prefHeight="515.0" prefWidth="870.0" style="-fx-background-color: #44414C;">
          <children>
-            <JFXTextField fx:id="tag" id="id" layoutX="34" layoutY="38.0" prefHeight="35.0" prefWidth="243" style="-fx-background-color: #ceffce;" text="DAI"/>
+            <JFXTextField fx:id="tag" id="id" layoutX="34" layoutY="38.0" prefHeight="35.0" prefWidth="185" style="-fx-background-color: #ceffce;" text="DAI"/>
+            <ComboBox fx:id="indics" id="indics" layoutX="227" layoutY="38.0" prefHeight="35.0" prefWidth="60" style="-fx-background-color: #ceffce;" />
             <JFXButton fx:id="refresh_button" layoutX="296.0" layoutY="38.0" onMouseClicked="#enter" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: lightgreen;" text="GO" />
             <TableView id="t_view" fx:id="t_view" layoutX="34.0" layoutY="91.0" onMouseClicked="#highlightRow" prefHeight="389.0" prefWidth="297.0" style="-fx-background-color: silver;">
               <columns>
