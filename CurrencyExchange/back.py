@@ -110,7 +110,7 @@ def plot_save(df, curr_pair, days):
     ax.xaxis_date()
     ax.autoscale_view()
 
-    plt.savefig('./Charts/' + curr_pair + str(days) + '.png')
+    plt.savefig('./Charts/' + curr_pair + '.png')
     plt.close()
 
 
